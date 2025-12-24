@@ -19,6 +19,8 @@ class GameScene(override var game: GameEngine, context: Context) : Scene {
     val player = Player("1", 100,40, pole)
     //val player2 = Player("2", 100,40, pole)
 
+    val hh=0
+
     var hod_player=0
 
     val listPlayers = arrayListOf<Player>(player)
