@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.mygame.GlobalParam.GlobalDxKoef
 
+
 class Pole(
     private val context: Context
 ) {
@@ -43,23 +44,25 @@ class Pole(
         R.drawable.eight,   //7
         R.drawable.nine,    //8
     )
-    val display = koor(context.resources.displayMetrics.widthPixels.toFloat(),
-        context.resources.displayMetrics.heightPixels.toFloat())
-    val ogranichenie = limitation(koor(0f,display.y*0.1f), koor(display.x*0.8f,display.y-display.y*0.1f))
+    val display = koorOnInt(context.resources.displayMetrics.widthPixels,
+                            context.resources.displayMetrics.heightPixels)
+    val ogranichenie = limitation(
+            koorOnInt(0, (display.y*0.1).toInt()),
+            koorOnInt((display.x*0.8).toInt(),(display.y-display.y*0.1).toInt()))
 
     // Делаем координаты наблюдаемыми состояниями
-    var poleX by mutableStateOf(0f)
+    var poleX by mutableStateOf(0)
     var poleY by mutableStateOf(ogranichenie.min.y)
-    var dx by mutableStateOf(0f)
+    var dx by mutableStateOf(0)
 
-    var minDx = 0f
-    var maxDx = display.y*0.1f //300f
-    private var previousTouchX = 0f
-    private var previousTouchY = 0f
+    var minDx = 0
+    var maxDx = display.y*0.1 //300
+    private var previousTouchX = 0
+    private var previousTouchY = 0
     private var isDragging = false
 
-    private var initialX2 = 0f
-    private var initialY2 = 0f
+    private var initialX2 = 0
+    private var initialY2 = 0
     private var touchState by mutableStateOf(TouchState())
 
     init {
@@ -97,11 +100,14 @@ class Pole(
 
     @Composable
     fun Render() {
+        Log.d("pole","$dx")
         drawHexagonPole() // рисует поле из шестиугольников
 
         //drawRectPole()// рисует поле из квадратов
+        /*
         rect(modifier = Modifier, ogranichenie.min.x, ogranichenie.min.y,
             (ogranichenie.max.x - ogranichenie.min.x), (ogranichenie.max.y - ogranichenie.min.y), 5f, Color.Blue)
+        */
     }
 
     @Composable
@@ -138,8 +144,8 @@ class Pole(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 // начало касания
-                previousTouchX = event.x
-                previousTouchY = event.y
+                previousTouchX = event.x.toInt()
+                previousTouchY = event.y.toInt()
                 isDragging = true
             }
 
@@ -147,17 +153,17 @@ class Pole(
                 // Второе и последующие касания
                 val pointerIndex = event.actionIndex
                 if (pointerIndex == 1) {
-                    initialX2 = event.getX(1)
-                    initialY2 = event.getY(1)
+                    initialX2 = event.getX(1).toInt()
+                    initialY2 = event.getY(1).toInt()
                 }
             }
 
             MotionEvent.ACTION_MOVE -> {
                 if (event.pointerCount >= 2) {
-                    val currentX1 = event.getX(0)
-                    val currentY1 = event.getY(0)
-                    val currentX2 = event.getX(1)
-                    val currentY2 = event.getY(1)
+                    val currentX1 = event.getX(0).toInt()
+                    val currentY1 = event.getY(0).toInt()
+                    val currentX2 = event.getX(1).toInt()
+                    val currentY2 = event.getY(1).toInt()
 
                     var distance0 = ""
 
@@ -166,35 +172,32 @@ class Pole(
                     val k = 2
                     var newX = poleX
                     var newY = poleY
-                    var newdx = touchState.newdX
+                    var newdx: Int = touchState.newdX
 
+                    // Уменьшение
                     if ((dist - touchState.dist < 0 && dx - k >= minDx)) {
-                        distance0 = "уменьшение"
-
                         newdx = dx - k
                         val old_x = mass.size*(dx*GlobalDxKoef)
                         val new_x = mass.size*(newdx*GlobalDxKoef)
-                        var delta = old_x-new_x
-                        newX = (poleX+delta/2).toFloat()
+                        var delta = (old_x-new_x).toInt()
+                        newX = (poleX+delta/2)
 
-                        val old_y = mass[0].size*dx+dx*0.5f
-                        val new_y = mass[0].size*newdx+newdx*0.5f
+                        val old_y = (mass[0].size*dx+dx*0.5).toInt()
+                        val new_y = (mass[0].size*newdx+newdx*0.5).toInt()
                         delta=old_y-new_y
-                        newY = (poleY+delta/2).toFloat()
-
+                        newY = (poleY+delta/2)
+                    //Увеличение
                     }else if ((dist - touchState.dist > 0 && dx+k<=maxDx)) {
-                        distance0 = "увеличение"
-
                         newdx = dx + k
                         val old_x=mass.size*(dx*GlobalDxKoef)
                         val new_x=mass.size*(newdx*GlobalDxKoef)
                         var delta = new_x-old_x
-                        newX = (poleX-delta/2).toFloat()
+                        newX = (poleX-delta/2).toInt()
 
-                        val old_y = mass[0].size*dx+dx*0.5f
-                        val new_y = mass[0].size*newdx+newdx*0.5f
+                        val old_y = mass[0].size*dx+dx*0.5
+                        val new_y = mass[0].size*newdx+newdx*0.5
                         delta=new_y-old_y
-                        newY = (poleY-delta/2).toFloat()
+                        newY = (poleY-delta/2).toInt()
 
                     }else {
                         touchState = TouchState(
@@ -216,7 +219,7 @@ class Pole(
                         poleX=ogranichenie.min.x
                     } else if (end_pole_x<ogranichenie.max.x) {
                         val delta=ogranichenie.max.x-end_pole_x
-                        poleX=newX+delta
+                        poleX= (newX+delta).toInt()
                     } else {
                         poleX=newX
                     }
@@ -241,8 +244,8 @@ class Pole(
                 }
 
                 if (isDragging && event.pointerCount == 1) {
-                    val currentX = event.x
-                    val currentY = event.y
+                    val currentX = event.x.toInt()
+                    val currentY = event.y.toInt()
 
                     // Вычисляем смещение
                     val deltaX = currentX - previousTouchX
@@ -273,20 +276,20 @@ class Pole(
                 isDragging = false
                 // Сброс координат при отпускании
                 if (event.pointerCount <= 1) {
-                    initialX2 = 0f
-                    initialY2 = 0f
-                    previousTouchX=0f
-                    previousTouchY=0f
+                    initialX2 = 0
+                    initialY2 = 0
+                    previousTouchX=0
+                    previousTouchY=0
                 }
                 touchState = TouchState()
             }
         }
     }
 
-    fun distanceBetweenPoints(x1: Float, y1: Float, x2: Float, y2: Float): Float {
+    fun distanceBetweenPoints(x1: Int, y1: Int, x2: Int, y2: Int): Int {
         val deltaX = x2 - x1
         val deltaY = y2 - y1
-        return sqrt(deltaX * deltaX + deltaY * deltaY)
+        return sqrt((deltaX * deltaX + deltaY * deltaY).toDouble()).toInt()
     }
 
     @Composable
@@ -302,9 +305,9 @@ class Pole(
             for (i in mass.indices) {
                 for (j in mass[i].indices) {
                     if (mass[i][j] != -1) {
-                        var l = 0f
+                        var l = 0
                         if (i % 2 != 0) {
-                            l = (dx * 0.5f)
+                            l = (dx/2)
                         }
                         val posX= (poleX + i * (dx * GlobalDxKoef)).toInt() // переделать на 0,73
                         val posY= (poleY + j * (dx) + l).toInt()
@@ -330,7 +333,7 @@ class Pole(
                                     textAlign = android.graphics.Paint.Align.CENTER
                                 }
 
-                                val textX = posX + dx / 2
+                                val textX = posX + dx / 2f
                                 val textY = posY + dx / 1.7f
 
                                 canvas.nativeCanvas.drawText("$i,$j", textX, textY, textPaint)
@@ -361,7 +364,7 @@ class Pole(
 
                         rect(
                             modifier = Modifier,posX,posY,
-                            dx,dx,5f, Color.Red
+                            dx.toFloat(),dx.toFloat(),5f, Color.Red
                         )
                     }
                 }
@@ -371,11 +374,11 @@ class Pole(
 }
 
 data class TouchState(
-    val do_deltaX1: Float = 0f,
-    val do_deltaY1: Float = 0f,
-    val do_deltaX2: Float = 0f,
-    val do_deltaY2: Float = 0f,
+    val do_deltaX1: Int = 0,
+    val do_deltaY1: Int = 0,
+    val do_deltaX2: Int = 0,
+    val do_deltaY2: Int = 0,
     val scale: String = "",
-    val dist: Float = 0f,
-    val newdX: Float = 0f,
+    val dist: Int = 0,
+    val newdX: Int = 0
 )

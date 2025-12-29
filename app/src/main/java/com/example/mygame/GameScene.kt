@@ -2,28 +2,39 @@ package com.example.mygame
 
 import android.content.Context
 import android.view.MotionEvent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 
 
 class GameScene(override var game: GameEngine, context: Context) : Scene {
     val contexts = context
     val displayMetrics = context.resources.displayMetrics
-    val screenXpx = displayMetrics.widthPixels.toFloat()
-    val screenYpx = displayMetrics.heightPixels.toFloat()
+    val screenXpx = displayMetrics.widthPixels
+    val screenYpx = displayMetrics.heightPixels
 
-    var pole = Pole( context = contexts)
+    var pole = Pole(context = contexts)
 
-    val button_point = ButtonImage((screenXpx*0.9f),(screenYpx*0.1f),
-        (screenXpx*0.05f),(screenYpx*0.1f),R.drawable.point)
-
-    val player = Player("1", 100,40, pole)
-    //val player2 = Player("2", 100,40, pole)
-
-    val hh=0
+    val button_point_back = ButtonImage((screenXpx*0.9).toInt(),(screenYpx*0.1).toInt(),
+        (screenXpx*0.05).toInt(),(screenYpx*0.1).toInt(),R.drawable.point)
 
     var hod_player=0
 
-    val listPlayers = arrayListOf<Player>(player)
+    // Используем lateinit var вместо val, чтобы пересоздавать Player при смене Pole
+    lateinit var player: Player
+    lateinit var listPlayers: ArrayList<Player>
+
+    init {
+        createPlayer()
+    }
+
+    private fun createPlayer() {
+        player = Player("1", 100,40, pole)
+        listPlayers = arrayListOf(player)
+    }
 
     override fun update() {
 
@@ -31,9 +42,15 @@ class GameScene(override var game: GameEngine, context: Context) : Scene {
 
     @Composable
     override fun render() {
-        //val context = LocalContext.current
+        Image(
+            painter = painterResource(id = R.drawable.background_menu),// Укажите ваш файл
+            contentDescription = "фон", // Описание для доступности (обязательно!)
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
+
         pole.Render()
-        button_point.Render()
+        button_point_back.Render()
 
         listPlayers[hod_player].Render()
     }
@@ -47,25 +64,24 @@ class GameScene(override var game: GameEngine, context: Context) : Scene {
             }
 
             MotionEvent.ACTION_UP -> {
-                val mx = event.getX(0)
-                val my = event.getY(0)
+                val mx = event.x.toInt()
+                val my = event.y.toInt()
 
                 if (event.pointerCount == 1) {
-                    if (button_point.click(mx,my)==true){
+                    if (button_point_back.click(mx,my)==true){
+                        // Пересоздаем Pole
                         pole = Pole(context = contexts)
+                        // Пересоздаем Player с новым Pole
+                        createPlayer()
                         game.CurrentScene="Menu"
                     }
                 }
 
                 // Принудительное обновление сцены
                 game.forceUpdate++
-
-                // Также можно добавить обновление массива игроков если нужно
-                // updatePlayersList()
             }
         }
     }
-
 
     override fun onEnter() {
 

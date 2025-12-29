@@ -21,14 +21,14 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
     val screenXpx = displayMetrics.widthPixels
     val screenYpx = displayMetrics.heightPixels
 
-    val button_game = ButtonImage(screenXpx*0.2f,screenYpx*0.38f,
-        screenXpx*0.6f,screenYpx*0.12f,R.drawable.game_two)
+    val button_game = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.38).toInt(),
+        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.game_two)
 
-    val button_setting = ButtonImage((screenXpx*0.2f),(screenYpx*0.5f),
-        screenXpx*0.6f,(screenYpx*0.12f),R.drawable.setting_two)
+    val button_setting = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.5).toInt(),
+        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.setting_two)
 
-    val button_authors = ButtonImage((screenXpx*0.2f),(screenYpx*0.623f),
-        screenXpx*0.6f,screenYpx*0.12f,R.drawable.authors_two)
+    val button_authors = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.623).toInt(),
+        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.authors_two)
 
 
     override fun update() {
@@ -58,8 +58,8 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
 
 
                 if (event.pointerCount == 1) {
-                    val mx = event.getX(0)
-                    val my = event.getY(0)
+                    val mx = event.x.toInt()
+                    val my = event.y.toInt()
 
                     /*Log.d("","$screenXpx")
                     Log.d("","$screenYpx")

@@ -34,6 +34,8 @@ class MainActivity : ComponentActivity() {
             Box(modifier = Modifier.fillMaxSize()) {
                 val scene = mapScene[currentScene]
 
+                scene?.update()
+
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { context ->
@@ -51,17 +53,16 @@ class MainActivity : ComponentActivity() {
                 scene?.render()
             }
         }
-
     }
 
     override fun onResume() {
         super.onResume()
-        //   gameView.resume()
+
     }
 
     override fun onPause() {
         super.onPause()
-        //      gameView.pause()
+
     }
 }
 

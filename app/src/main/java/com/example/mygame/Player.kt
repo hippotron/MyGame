@@ -12,29 +12,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.sp
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.example.mygame.GlobalParam.GlobalDxKoef
-
-@Composable
-fun TestCanvas() {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        // Простой текст без textMeasurer
-        // (для теста можно использовать drawIntoCanvas)
-    }
-}
+import com.example.mygame.GlobalParam.TextRender
 
 class Player(
     val name: String,
@@ -43,84 +31,181 @@ class Player(
     val pole: Pole
 ) {
 
-    val image_mass: MutableList<Int> = mutableListOf(
+    val image_mass_units: MutableList<Int> = mutableListOf(
         R.drawable.skeleton,
-        R.drawable.image_return,
-        R.drawable.point,
-        R.drawable.six
+        R.drawable.barbarian,
+        R.drawable.knight,
+        R.drawable.hard_khight
     )
-
-    val dx: Int get() = pole.dx.toInt()
-    val poleX: Float get() = pole.poleX
-    val poleY: Float get() = pole.poleY
-    val mass get() = pole.mass
 
     // Используем mutableStateListOf для автоматического обновления
     val units = mutableStateListOf<Unit>(
         Unit(koorOnInt(6,10),
-             0,
-             dx
+             strength = 1,
+             pole.dx
         )
     )
 
-    val farms = mutableListOf<Farm>(
-        Farm(koorOnInt(5,5),
+    val buildings = mutableListOf<Build>(
+        Build(koorOnInt(5,5),
             Terrain.FARM.value,
             20)
     )
-
-
 
     var selectedUnit by mutableStateOf<Int?>(null)
 
     var touchRender by mutableStateOf(0)
 
-    fun onTouch(event: MotionEvent) {
-        when (event.actionMasked) {
+    var delivereUnit = false
+
+    var strengthAddUnit = 0
+    val unitSettings = ButtonImage(
+        (pole.display.x*0.6).toInt(),
+        (pole.display.y*0.9).toInt(),
+        200,
+        200,
+        R.drawable.skeleton)
+
+
+    val clAddUnit0 = ButtonImage(
+        (pole.display.x*0.15).toInt(),
+        (pole.display.y*0.85).toInt(),
+        150,
+        150,
+        R.drawable.skeleton,
+        name2 = R.drawable.dedicated_skeleton,
+        type = mutableStateOf(1)
+    )
+    val clAddUnit1 = ButtonImage(
+        (pole.display.x*0.35).toInt(),
+        (pole.display.y*0.85).toInt(),
+        150,
+        150,
+        R.drawable.barbarian,
+        name2 = R.drawable.dedicated_barbarin,
+        type = mutableStateOf(1)
+    )
+    val clAddUnit2 = ButtonImage(
+        (pole.display.x*0.55).toInt(),
+        (pole.display.y*0.85).toInt(),
+        150,
+        150,
+        R.drawable.knight,
+        name2 = R.drawable.dedicated_knight,
+        type = mutableStateOf(1)
+    )
+    val clAddUnit3 = ButtonImage(
+        (pole.display.x*0.75).toInt(),
+        (pole.display.y*0.85).toInt(),
+        150,
+        150,
+        R.drawable.hard_khight,
+        name2 = R.drawable.dedicated_hard_knight,
+        type = mutableStateOf(1)
+    )
+
+    fun addUnit(x: Int, y: Int, strength: Int, size: Int){
+        units.add(Unit(koorOnInt(x,y),strength,size))
+    }
+
+    fun onTouch(event: MotionEvent)
+    {
+        when (event.actionMasked)
+        {
             MotionEvent.ACTION_DOWN -> {
                 val (massX, massY) = Search_massY_massY(event.x,event.y)
 
-                if (massX!=null && massY!=null) {
+                if (massX != null && massY != null)
+                {
+                    if (delivereUnit != true) {
+                        if (selectedUnit != null) {
+                            val possibleMoves = Possible_moves(
+                                units[selectedUnit!!].koorOnPole.x,
+                                units[selectedUnit!!].koorOnPole.y,
+                                2,
+                                units[selectedUnit!!]
+                            )
+                            for (i in possibleMoves.indices) {
+                                if (massX == possibleMoves[i].x && massY == possibleMoves[i].y) {
+                                    units[selectedUnit!!].koorOnPole.x = massX
+                                    units[selectedUnit!!].koorOnPole.y = massY
 
-                    if (selectedUnit != null) {
-                        val possibleMoves = Possible_moves(
-                            units[selectedUnit!!].koorOnPole.x,
-                            units[selectedUnit!!].koorOnPole.y,
-                            2)
-                        for (i in possibleMoves.indices) {
-                            if (massX==possibleMoves[i].x && massY==possibleMoves[i].y) {
-                                units[selectedUnit!!].koorOnPole.x = massX
-                                units[selectedUnit!!].koorOnPole.y = massY
-
-                                units[selectedUnit!!].size.value = dx
-                                selectedUnit = null
-                                break
-                            }
-                        }
-                    }else{
-                        if (selectedUnit==null){
-                            for (i in units.indices){
-                                if (massX==units[i].koorOnPole.x && massY==units[i].koorOnPole.y){
-                                    selectedUnit=i
-                                    units[i].size.value=dx+dx/2
+                                    units[selectedUnit!!].size.value = pole.dx
+                                    selectedUnit = null
+                                    break
                                 }
                             }
+                        } else { // selectedUnit == null
+                            for (i in units.indices) {
+                                if (massX == units[i].koorOnPole.x && massY == units[i].koorOnPole.y) {
+                                    selectedUnit = i
+                                    units[i].size.value = pole.dx + pole.dx / 2 }
+                            }
                         }
+                    } else { //delivereUnit == true
+
+                        addUnit(massX,massY, strengthAddUnit,pole.dx)
+                        delivereUnit=false
                     }
                 }
+                touchRender++
+            }
+
+            MotionEvent.ACTION_UP -> {
+                val mx = event.x.toInt()
+                val my = event.y.toInt()
+
+                if (delivereUnit==true){
+                    strengthAddUnit = 0
+                    clAddUnit0.type.value = 1
+                    clAddUnit1.type.value = 1
+                    clAddUnit2.type.value = 1
+                    clAddUnit3.type.value = 1
+
+                    if (clAddUnit0.click(mx, my)) {
+                        strengthAddUnit = 0
+                        clAddUnit0.type.value=2
+                    }
+                    if (clAddUnit1.click(mx, my)) {
+                        strengthAddUnit = 1
+                        clAddUnit1.type.value=2
+                    }
+                    if (clAddUnit2.click(mx, my)) {
+                        strengthAddUnit = 2
+                        clAddUnit2.type.value=2
+                    }
+                    if (clAddUnit3.click(mx, my)) {
+                        strengthAddUnit = 3
+                        clAddUnit3.type.value=2
+                    }
+                }
+
+                if (unitSettings.click(event.x.toInt(),event.y.toInt())) {
+                    if (delivereUnit==false) {
+                        delivereUnit = true
+                    } else {
+                        delivereUnit=false
+                    }
+                }
+
                 touchRender++
             }
         }
     }
 
     @Composable
-    fun Render() {
+    fun Render()
+    {
+        val updateRender = touchRender
         val context = LocalContext.current
-        val imageBitmaps = remember {
-            image_mass.map { resourceId ->
+        val imageBitmapsUnits = remember {
+            image_mass_units.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
             }
         }
+
+        val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
+
         // Заранее загружаем bitmap
         val farmBitmap = ImageBitmap.imageResource(id = R.drawable.farm)
         Log.d("","render")
@@ -128,34 +213,34 @@ class Player(
         // Создаем TextMeasurer
         val textMeasurer = rememberTextMeasurer()
 
+        unitSettings.Render()
+
+        if (delivereUnit==true){
+            clAddUnit0.Render()
+            clAddUnit1.Render()
+            clAddUnit2.Render()
+            clAddUnit3.Render()
+        }
+
         Canvas(modifier = Modifier.fillMaxSize()) {
 
-            RenderPossibleMoves(imageBitmaps[3])
-            RenderUnits(imageBitmaps)
+            RenderPossibleMoves(transparentHexagonBitmap)
+            RenderUnits(imageBitmapsUnits)
             RenderFarms(farmBitmap)
-
             // Казна
-            drawText(
-                textMeasurer = textMeasurer,
-                text = "$kazna",
-                style = TextStyle(
-                    color = androidx.compose.ui.graphics.Color.Black,
-                    fontSize = 24.sp,        // ← Размер больше (по умолчанию 14.sp)
-                    fontWeight = FontWeight.Bold ), // <- жирный текст
-                topLeft = Offset(pole.display.x*0.1f, pole.display.y*0.05f)
-            )
-
+            TextRender(
+                textMeasurer,
+                kazna,
+                (pole.display.x*0.1),
+                (pole.display.y*0.05),
+                24)
             // Доход
-            drawText(
-                textMeasurer = textMeasurer,
-                text = "$income",
-                style = TextStyle(
-                    color = androidx.compose.ui.graphics.Color.Black,
-                    fontSize = 24.sp,        // ← Размер больше (по умолчанию 14.sp)
-                    fontWeight = FontWeight.Bold ), // <- жирный текст
-                topLeft = Offset(pole.display.x*0.47f, pole.display.y*0.05f)
-            )
-
+            TextRender(
+                textMeasurer,
+                income,
+                (pole.display.x*0.47),
+                (pole.display.y*0.05),
+                24)
         }
     }
 
@@ -164,7 +249,7 @@ class Player(
         if (selectedUnit != null) {
             val selectedX = units[selectedUnit!!].koorOnPole.x
             val selectedY = units[selectedUnit!!].koorOnPole.y
-            val possibleMoves = Possible_moves(selectedX, selectedY, 2)
+            val possibleMoves = Possible_moves(selectedX, selectedY, 2, units[selectedUnit!!])
 
             // Преобразуем возможные ходы в пары Pair
             val possibleMovesSet = possibleMoves.map { Pair(it.x, it.y) }
@@ -173,7 +258,8 @@ class Player(
                 for (j in pole.mass[i].indices) {
                     // Проверяем, что клетка НЕ входит в possibleMoves
                     if (Pair(i, j) !in possibleMovesSet) {
-                        this.RenderImageUnit(i,j,dx,dx,possibleBitmap)
+                        // прозначный шестигранник
+                        this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap)
                     }
                 }
             }
@@ -182,10 +268,11 @@ class Player(
 
     fun DrawScope.RenderFarms(farmBitmap: ImageBitmap)
     {
-        for (i in farms.indices) {
-            val farm = farms[i]
-            this.RenderImageUnit(farm.koorOnPole.x, farm.koorOnPole.y, dx, dx, farmBitmap)
+        for (i in buildings.indices) {
+            val farm = buildings[i]
+            this.RenderImage(farm.koorOnPole.x, farm.koorOnPole.y, pole.dx, pole.dx, farmBitmap)
         }
+        //Log.d("player","$currentDx")
     }
 
     fun DrawScope.RenderUnits(imageBitmaps: List<ImageBitmap>)
@@ -198,33 +285,37 @@ class Player(
                 if (selectedUnit!=null && i==selectedUnit){
                     scale=50
                 }
-                this.RenderImageUnit(units[i].koorOnPole.x,units[i].koorOnPole.y,dx,dx,imageBitmaps[number],scale)
+                this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,imageBitmaps[number],scale)
             }
         }
     }
 
-
-    fun DrawScope.RenderImageUnit(i : Int, j : Int, lx : Int, ly : Int,  imageBitmap : ImageBitmap, scale :Int = 0 ) {
+    fun DrawScope.RenderImage(i : Int, j : Int, lx : Int, ly : Int, imageBitmap : ImageBitmap, scale :Int = 0, trDX: Int = 0)
+    {
         var l = 0
         if (i % 2 != 0) {
-            l = dx / 2
+            l = ly / 2
         }
-        val posX = (poleX + i * (dx * GlobalDxKoef)).toInt()
-        val posY = (poleY + j * dx + l).toInt()
+        var posX = (pole.poleX + i * (lx * GlobalDxKoef)).toInt()
+        val posY = (pole.poleY + j * ly + l).toInt()
+        var finallLx = lx
+        if ( trDX!= 0){
+            finallLx = trDX
+            posX = (posX+pole.dx*0.7).toInt()
+        }
 
         drawImage(
             image = imageBitmap,
             dstOffset = IntOffset(posX-scale/2, posY-scale/2),
-            dstSize = IntSize(lx+scale, lx+scale)
+            dstSize = IntSize(finallLx+scale, ly+scale)
         )
     }
 
-    fun Possible_moves(X: Int, Y: Int, N: Int): List<koorOnInt> {
+    fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit): List<koorOnInt>
+    {
 
         // Массив вообще всех возможных ходов
-        val allMoves = mutableSetOf<koorOnInt>() // Set убирает дубликаты
-        // Получаем список координат ферм для быстрой проверки
-        val farmCoordinates = farms.map { it.koorOnPole.x to it.koorOnPole.y }.toSet()
+        val movesAround = mutableSetOf<koorOnInt>() // Set убирает дубликаты
 
         // Получаем возможные ходы вокруг
         val directMoves = mutableListOf<koorOnInt>()
@@ -248,60 +339,81 @@ class Player(
             }
         }
         // Добавляем возможные ходы вокруг ко всем
-        allMoves.addAll(directMoves)
+        movesAround.addAll(directMoves)
 
         if (N > 1) {
             // делаем цикл по возможным ходам вокруг
             for (move in directMoves) {
                 // получаем возможные ходы от возможного move хода
-                val recursiveMoves = Possible_moves(move.x, move.y, N - 1)
+                val recursiveMoves = Possible_moves(move.x, move.y, N - 1, currentUnit1)
                 // добавляем эти возможные ходы ко всем возможным ходам
-                allMoves.addAll(recursiveMoves)
+                movesAround.addAll(recursiveMoves)
             }
         }
 
+        // Получаем список координат ферм для быстрой проверки
+        val farmCoordinates = buildings.map { it.koorOnPole.x to it.koorOnPole.y }.toSet()
+
         // удаляем фермы из возможных ходов
-        allMoves.removeAll { move ->
+        movesAround.removeAll { move ->
             move.x to move.y in farmCoordinates
         }
 
+        // Создаем mutable список с текущей позицией
+        val allMoves = mutableListOf(koorOnInt(X, Y))
+
+        // Добавляем отфильтрованные ходы вокруг
+        allMoves.addAll(movesAround.filter { move ->
+            // Находим юнита на этой позиции (если есть)
+            val unitAtCell = units.find { it.koorOnPole.x == move.x && it.koorOnPole.y == move.y }
+
+            // Если юнита нет - клетка доступна
+            if (unitAtCell == null) return@filter true
+
+            // Если есть юнит и он слабее текущего - клетка доступна для атаки
+            // Если юнит сильнее или равен по силе - клетка недоступна
+            currentUnit1.strength > unitAtCell.strength
+        })
+
         // возращаем все возможные ходы
-        return allMoves.toList()
+        return allMoves
     }
 
     // Вспомогательная функция для проверки клетки
-    fun isValidMove(koorOnInt: koorOnInt): Boolean {
+    fun isValidMove(koorOnInt: koorOnInt): Boolean
+    {
         // Проверяем границы массива
-        if (koorOnInt.x < 0 || koorOnInt.x >= mass.size || koorOnInt.y < 0 || koorOnInt.y >= mass[0].size) {
+        if (koorOnInt.x < 0 || koorOnInt.x >= pole.mass.size || koorOnInt.y < 0 || koorOnInt.y >= pole.mass[0].size) {
             return false
         }
         // Проверяем, что не вода
-        if (mass[koorOnInt.x][koorOnInt.y] == Terrain.WATER.value) {
+        if (pole.mass[koorOnInt.x][koorOnInt.y] == Terrain.WATER.value) {
             return false
         }
 
         return true
     }
 
-    fun Search_massY_massY(X: Float, Y: Float): Pair<Int?, Int?> {
-        val lenPoleX = poleX + dx * GlobalDxKoef * mass.size + dx * 0.3f
-        val lenPoleY = poleY + dx * mass[0].size + dx / 2
+    fun Search_massY_massY(X: Float, Y: Float): Pair<Int?, Int?>
+    {
+        val lenPoleX = pole.poleX + pole.dx * GlobalDxKoef * pole.mass.size + pole.dx * 0.3
+        val lenPoleY = pole.poleY + pole.dx * pole.mass[0].size + pole.dx / 2
 
         var massX: Int? = null
         var massY: Int? = null
 
-        if (poleX < X && X < lenPoleX && poleY < Y && Y < lenPoleY) {
-            massX = ((X - poleX) / (dx * GlobalDxKoef)).toInt()
+        if (pole.poleX < X && X < lenPoleX && pole.poleY < Y && Y < lenPoleY) {
+            massX = ((X - pole.poleX) / (pole.dx * GlobalDxKoef)).toInt()
 
             if (massX % 2 != 0) {
-                massY = ((Y - poleY - dx / 2) / dx).toInt()
+                massY = ((Y - pole.poleY - pole.dx / 2) / pole.dx).toInt()
             } else {
-                massY = ((Y - poleY) / dx).toInt()
+                massY = ((Y - pole.poleY) / pole.dx).toInt()
             }
 
             // Ограничиваем координаты
-            if (massY > mass[0].size-1) massY = mass[0].size-1
-            if (massX > mass.size-1) massX = mass.size-1
+            if (massY > pole.mass[0].size-1) massY = pole.mass[0].size-1
+            if (massX > pole.mass.size-1) massX = pole.mass.size-1
             if (massY < 0) massY = 0
             if (massX < 0) massX = 0
         }

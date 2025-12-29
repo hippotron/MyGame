@@ -1,6 +1,6 @@
 package com.example.mygame
 
-class limitation(min1: koor , max1: koor) {
-    var min: koor = min1
-    var max: koor = max1
+class limitation(min1: koorOnInt , max1: koorOnInt) {
+    var min: koorOnInt = min1
+    var max: koorOnInt = max1
 }

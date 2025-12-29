@@ -1,6 +1,6 @@
 package com.example.mygame
 
-class Farm (
+class Build (
     val koorOnPole: koorOnInt,
     val type: Int,
     val income: Int

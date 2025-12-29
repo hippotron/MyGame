@@ -6,68 +6,52 @@ import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 
 class ButtonImage(
-    val x: Float,
-    val y: Float,
-    val dx: Float,
-    val dy: Float,
-    val name: Int
-
+    val x: Int,
+    val y: Int,
+    val dx: Int,
+    val dy: Int,
+    val name: Int,
+    val name2: Int = name,
+    var type: MutableState<Int> = mutableStateOf(1)  // Используем State
 ) {
     @Composable
     fun Render() {
         // эта строка получает доступ к контексту, он необходим для доступа к картинкам
-        val context = LocalContext.current
-        // загружает картинку
-        val image = remember {
-            /* BitmapFactory нужен для создания изображения
-             decodeResource метод для загрузки картинки из папки res/drawble
-             context.resources получает доступ к ресурсам
-             name это переменная пути к картинке, в место него можно написать конкретный путь к картинке
-            */
-            BitmapFactory.decodeResource(context.resources, name)
-        }
+        // val context = LocalContext.current
+
+        val image = if (type.value == 1)
+            ImageBitmap.imageResource(id = name)
+        else
+            ImageBitmap.imageResource(id = name2)
+
         // Canvas создает холст(область для рисования) на весь экран
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            /* создается прямоугольник который определяет где и какого размера будет нарисована картинка
-             x это откуда рисовать по x
-             y откуда рисовать по y
-             x+dx а это до куда рисовать картинку по x
-             y+dy это до куда рисовать картинку по y */
 
-            val Rect = RectF(x, y, x + dx, y + dy)
-            /* рисует картинку
-             image картинка которую нужно нарисовать
-             null означает что мы хотим нарисовать полное изброжение а не его часть
-             Rect прямоугольник, который определяет область где будет нарисована картинка
-             null означает что мы рисуем картинку без доп. эффектов(прозрачности и тд)*/
-             drawContext.canvas.nativeCanvas.drawBitmap(image, null, Rect, null)
+            drawImage(
+                image = image,
+                dstOffset = IntOffset(x, y),
+                dstSize = IntSize(dx, dy)
+            )
         }
-        //}
     }
 
-    fun click(mx: Float, my: Float): Boolean{
-        /*
-        Log.d("","x = $x")
-        Log.d("","y = $y")
-        //Log.d("","dx = $dx")
-        //Log.d("","dy = $dy")
-        Log.d("","x+dx = ${x+dx}")
-        Log.d("","y+dy = ${x+dy}")
-        Log.d("","mx = $mx")
-        Log.d("","my = $mx")
-        */
-
+    fun click(mx: Int, my: Int): Boolean{
         if (x<mx && mx<x+dx && y<my && my<y+dy){
-            //Log.d("","777")
             return true
         } else{
             return false

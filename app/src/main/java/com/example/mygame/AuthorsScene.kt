@@ -21,8 +21,8 @@ class AuthorsScene(override var game: GameEngine,context: Context) : Scene {
     val screenXpx = displayMetrics.widthPixels
     val screenYpx = displayMetrics.heightPixels
 
-    val button_return = ButtonImage(screenXpx*0.1f,screenYpx*0.07f,
-        screenXpx*0.3f,screenYpx*0.1f,R.drawable.image_return)
+    val button_return = ButtonImage((screenXpx*0.1).toInt(),(screenYpx*0.07).toInt(),
+        (screenXpx*0.3).toInt(),(screenYpx*0.1).toInt(),R.drawable.image_return)
 
     @Composable
     override fun render() {
@@ -48,8 +48,8 @@ class AuthorsScene(override var game: GameEngine,context: Context) : Scene {
 
             }
             MotionEvent.ACTION_UP -> {
-                val mx = event.getX(0)
-                val my = event.getY(0)
+                val mx = event.x.toInt()
+                val my = event.y.toInt()
 
                 if (event.pointerCount == 1) {
                     if (button_return.click(mx,my)==true){

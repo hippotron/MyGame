@@ -22,8 +22,8 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
     val screenXpx = displayMetrics.widthPixels.toFloat()
     val screenYpx = displayMetrics.heightPixels.toFloat()
 
-    val button_return = ButtonImage(screenXpx*0.1f,screenYpx*0.07f,
-        screenXpx*0.3f,screenYpx*0.1f,R.drawable.image_return)
+    val button_return = ButtonImage((screenXpx*0.1).toInt(),(screenYpx*0.07).toInt(),
+        (screenXpx*0.3).toInt(),(screenYpx*0.1).toInt(),R.drawable.image_return)
 
     @Composable
     override fun render() {
@@ -44,8 +44,8 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
 
             }
             MotionEvent.ACTION_UP -> {
-                val mx = event.getX(0)
-                val my = event.getY(0)
+                val mx = event.x.toInt()
+                val my = event.y.toInt()
 
                 //Log.d("","$screenXpx")
                 //Log.d("","$screenYpx")
