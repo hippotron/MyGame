@@ -27,10 +27,10 @@ import com.example.mygame.GlobalParam.GlobalDxKoef
 
 
 class Pole(
-    private val context: Context
+    private val context: Context,
 ) {
     // Создаём изменяемый двумерный массив
-    var mass: MutableList<MutableList<Int>> = mutableListOf( )
+    var mass: MutableList<MutableList<Cell>> = mutableListOf( )
 
     // Создаём изменяемый двумерный массив
     val image_mass: MutableList<Int> = mutableListOf(
@@ -44,8 +44,10 @@ class Pole(
         R.drawable.eight,   //7
         R.drawable.nine,    //8
     )
-    val display = koorOnInt(context.resources.displayMetrics.widthPixels,
-                            context.resources.displayMetrics.heightPixels)
+    val display = koorOnInt(
+        context.resources.displayMetrics.widthPixels,
+        context.resources.displayMetrics.heightPixels
+    )
     val ogranichenie = limitation(
             koorOnInt(0, (display.y*0.1).toInt()),
             koorOnInt((display.x*0.8).toInt(),(display.y-display.y*0.1).toInt()))
@@ -71,8 +73,20 @@ class Pole(
     }
 
     private fun initializePole() {
-        mass = createMatrix(11,17,0)
+        mass = createCellMatrix(11,17)
         calculateHexagonWidth( )
+    }
+
+    fun createCellMatrix(width: Int, height: Int): MutableList<MutableList<Cell>> {
+        return MutableList(width) { row ->
+            MutableList(height) { col ->
+                Cell(
+                    player = null,
+                    occupied = false,
+                    protection = 0
+                )
+            }
+        }
     }
 
     fun createMatrix(x: Int, y: Int, defaultValue: Int = 0): MutableList<MutableList<Int>> {
@@ -304,7 +318,6 @@ class Pole(
         Canvas(modifier = Modifier.fillMaxSize()) {
             for (i in mass.indices) {
                 for (j in mass[i].indices) {
-                    if (mass[i][j] != -1) {
                         var l = 0
                         if (i % 2 != 0) {
                             l = (dx/2)
@@ -316,7 +329,11 @@ class Pole(
                             posY + dx > 0 && posY < display.y
                         ) {
                             // Получаем индекс изображения из массива mass
-                            val imageIndex = mass[i][j]
+                            var imageIndex = 0
+                            if (mass[i][j].player!=null){
+                                imageIndex= mass[i][j].player!!.color
+                            }
+
                             if (imageIndex in imageBitmaps.indices) {
                                 drawImage(
                                     image = imageBitmaps[imageIndex],
@@ -340,7 +357,7 @@ class Pole(
                             }
 
                         }
-                    }
+
                 }
             }
         }
@@ -350,7 +367,7 @@ class Pole(
     fun drawRectPole(){
         for (i in mass.indices) {
             for (j in mass[i].indices) {
-                if (mass[i][j] != -1) {
+                if (mass[i][j].player!!.color != -1) {
                     var l = 0f
                     if (i % 2 != 0) {
                         l = (dx * 0.5).toFloat()

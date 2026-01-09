@@ -32,7 +32,7 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
 
 
     override fun update() {
-        TODO("Not yet implemented")
+
     }
 
     @Composable

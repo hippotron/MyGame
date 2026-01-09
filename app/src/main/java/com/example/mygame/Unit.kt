@@ -19,7 +19,7 @@ class Unit(
     var koorOnPole: koorOnInt,
     var strength: Int = 0,
     initialSize: Int = 60,
-
+    var canMove: Boolean
 ) {
     var size: MutableState<Int> = mutableStateOf(initialSize)
 }
