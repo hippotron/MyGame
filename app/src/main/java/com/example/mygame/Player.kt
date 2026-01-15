@@ -1,6 +1,5 @@
 package com.example.mygame
 
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
@@ -9,41 +8,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.example.mygame.GlobalParam.GlobalDxKoef
-import com.example.mygame.GlobalParam.TextRender
+import com.example.mygame.ui.theme.Economic
 
 class Player(
     val name: String,
-    var kazna: Int,
-    var income: Int,
     val pole: Pole,
-    var color: Int
+    var color: Int,
+    val economic: HashMap<Terrain, Economic>,
+    val image_mass: HashMap<Terrain, ImageBitmap>
 ) {
 
-    val image_mass_units: MutableList<Int> = mutableListOf(
-        R.drawable.skeleton,
-        R.drawable.barbarian,
-        R.drawable.knight,
-        R.drawable.hard_khight
-    )
 
-    val image_mass_builds: MutableList<Int> = mutableListOf(
-        R.drawable.farm,
-        R.drawable.tower,
-        R.drawable.tower_hard
-    )
     // Используем mutableStateListOf для автоматического обновления
     val units = mutableStateListOf<Unit>( )
 
@@ -56,93 +40,169 @@ class Player(
     var delivereUnit = false
     var delivereBuild = false
 
-    var strengthAddUnit = 0
-    var selectAddBulid = 0
+    var selectAddUnit: Terrain = Terrain.NONE
+    var selectAddBulid: Terrain = Terrain.NONE
 
     val buildSettings = ButtonImage(
-        (pole.display.x*0.3).toInt(),
-        (pole.display.y*0.9).toInt(),
-        200,
-        200,
+        (pole.display.x*0.29).toInt(),
+        (pole.display.y*0.89).toInt(),
+        (pole.display.x*0.21).toInt(),
+        (pole.display.y*0.1).toInt(),
         R.drawable.farm)
 
     val unitSettings = ButtonImage(
         (pole.display.x*0.6).toInt(),
         (pole.display.y*0.9).toInt(),
-        200,
-        200,
+        (pole.display.x*0.21).toInt(),
+        (pole.display.y*0.09).toInt(),
         R.drawable.skeleton)
 
-    val unitButtons = listOf(
-        ButtonImage(
-            (pole.display.x * 0.15).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.skeleton,
-            name2 = R.drawable.dedicated_skeleton,
-            type = mutableStateOf(1)
-        ),
-        ButtonImage(
+    var unitButtonsMap= HashMap<Terrain, ButtonImage>()
+    var buildButtonMap = HashMap<Terrain, ButtonImage>()
+
+    var kazna by mutableStateOf(0)
+    var income by mutableStateOf(0)
+    var sale by  mutableStateOf(0)
+
+
+    init {
+        initButtonUnit()
+        initButtonBuild()
+    }
+
+    fun initButtonUnit() {
+        val b1 =
+            ButtonImage(
+                (pole.display.x * 0.15).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150,
+                150,
+                R.drawable.skeleton,
+                name2 = R.drawable.dedicated_skeleton,
+                type = mutableStateOf(1)
+            )
+        unitButtonsMap[Terrain.UNIT1]=b1
+
+        val b2 = ButtonImage(
             (pole.display.x * 0.35).toInt(),
             (pole.display.y * 0.85).toInt(),
             150, 150,
             R.drawable.barbarian,
             name2 = R.drawable.dedicated_barbarin,
             type = mutableStateOf(1)
-        ),
-        ButtonImage(
-            (pole.display.x * 0.55).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.knight,
-            name2 = R.drawable.dedicated_knight,
-            type = mutableStateOf(1)
-        ),
-        ButtonImage(
-            (pole.display.x * 0.75).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.hard_khight,
-            name2 = R.drawable.dedicated_hard_knight,
-            type = mutableStateOf(1)
         )
-    )
+        unitButtonsMap[Terrain.UNIT2]=b2
+        val b3 =
+            ButtonImage(
+                (pole.display.x * 0.55).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150, 150,
+                R.drawable.knight,
+                name2 = R.drawable.dedicated_knight,
+                type = mutableStateOf(1)
+            )
+        unitButtonsMap[Terrain.UNIT3]=b3
+        val b4 =
+            ButtonImage(
+                (pole.display.x * 0.75).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150, 150,
+                R.drawable.hard_khight,
+                name2 = R.drawable.dedicated_hard_knight,
+                type = mutableStateOf(1)
+            )
+        unitButtonsMap[Terrain.UNIT4]=b4
+    }
 
-    val buildButtons = listOf(
-        ButtonImage(
-            (pole.display.x * 0.25).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.farm,
-            name2 = R.drawable.dedicated_farm,
-            type = mutableStateOf(1)
-        ),
-        ButtonImage(
-            (pole.display.x * 0.45).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.tower,
-            name2 = R.drawable.dedicated_tower,
-            type = mutableStateOf(1)
-        ),
-        ButtonImage(
-            (pole.display.x * 0.65).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.tower_hard,
-            name2 = R.drawable.tower_hard,
-            type = mutableStateOf(1)
-        )
-    )
+    fun initButtonBuild() {
+        val b1 =
+            ButtonImage(
+                (pole.display.x * 0.25).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150, 150,
+                R.drawable.farm,
+                name2 = R.drawable.dedicated_farm,
+                type = mutableStateOf(1)
+            )
+        buildButtonMap[Terrain.FARM]=b1
+        val b2 =
+            ButtonImage(
+                (pole.display.x * 0.45).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150, 150,
+                R.drawable.tower,
+                name2 = R.drawable.dedicated_tower,
+                type = mutableStateOf(1)
+            )
+        buildButtonMap[Terrain.TOWER]=b2
+        val b3 =
+            ButtonImage(
+                (pole.display.x * 0.65).toInt(),
+                (pole.display.y * 0.85).toInt(),
+                150, 150,
+                R.drawable.tower_hard,
+                name2 = R.drawable.tower_hard,
+                type = mutableStateOf(1)
+            )
+        buildButtonMap[Terrain.HARD_TOWER]=b3
+    }
+
+    fun getKazna(){
+        getIncome()
+        getSale()
+
+        kazna=kazna+income-sale
+    }
+
+    fun getSale(){
+        var sumFarm=0
+        for (i in buildings){
+            if (i.type != Terrain.FARM){
+                val c = economic[i.type]?.sale ?: 0
+                sumFarm=sumFarm+c
+            }
+        }
+
+        var sumUnits=0
+        for (i in units){
+            val c = economic[i.type]?.sale ?: 0
+            sumUnits=sumUnits+c
+        }
+        sale=sumUnits+sumFarm
+    }
+
+    fun getIncome(){
+        var sumCells=0
+        for (i in pole.mass){
+            for (cell in i){
+                if (cell.player == this){
+                    sumCells++
+                }
+            }
+        }
+
+        var sumFarm=0
+        for (i in buildings){
+            if (i.type == Terrain.FARM){
+                sumFarm++
+            }
+        }
+
+        val cell = economic[Terrain.LAND]?.income ?: 0
+        val farm = economic[Terrain.FARM]?.income ?: 0
+        income = sumCells * cell + sumFarm*farm
+
+    }
 
     fun onTouch(event: MotionEvent)
     {
+        getIncome()
         when (event.actionMasked)
         {
             MotionEvent.ACTION_DOWN -> {
-                strengthAddUnit = if (strengthAddUnit!=0) strengthAddUnit else 0
-                selectAddBulid = if (selectAddBulid!=0) selectAddBulid else 0
 
+                //strengthAddUnit = if (strengthAddUnit!=0) strengthAddUnit else 0
+                //selectAddBulid = if (selectAddBulid!=0) selectAddBulid else 0
 
                 val (massX, massY) = Search_massY_massY(event.x,event.y)
 
@@ -167,12 +227,12 @@ class Player(
                                             units[selectedUnit!!].canMove = false
                                         }
 
-                                        pole.mass[units[selectedUnit!!].koorOnPole.x][units[selectedUnit!!].koorOnPole.y].occupied = false
+                                        //pole.mass[units[selectedUnit!!].koorOnPole.x][units[selectedUnit!!].koorOnPole.y].occupied = false
                                         units[selectedUnit!!].koorOnPole.x = massX
                                         units[selectedUnit!!].koorOnPole.y = massY
 
                                         pole.mass[massX][massY].player = this
-                                        pole.mass[massX][massY].occupied = true
+                                       // pole.mass[massX][massY].occupied = true
 
                                         units[selectedUnit!!].size.value = pole.dx
 
@@ -192,20 +252,18 @@ class Player(
                                 }
                             }
                         } else { //delivereUnit == true
-                            if (pole.mass[massX][massY].player==this && !pole.mass[massX][massY].occupied) {
-                                addUnit(massX, massY, strengthAddUnit, pole.dx)
-                                pole.mass[massX][massY].occupied=true
-                            }
-                            strengthAddUnit = 0
+                            //if (pole.mass[massX][massY].player==this && !pole.mass[massX][massY].occupied) {
+                                addUnit(massX, massY, selectAddUnit, pole.dx)
+                                pole.mass[massX][massY].player=this
+                            //}
+                            selectAddUnit = Terrain.UNIT1
                             delivereUnit = false
                         }
                     } else{
-                        if (pole.mass[massX][massY].player==this && !pole.mass[massX][massY].occupied) {
+                        if (pole.mass[massX][massY].player==this) {
                             addBuild(massX, massY, selectAddBulid)
-                            pole.mass[massX][massY].occupied=true
-
                         }
-                        selectAddBulid = 0
+                        selectAddBulid = Terrain.NONE
                         delivereBuild = false
                     }
                 }
@@ -213,31 +271,31 @@ class Player(
             }
 
             MotionEvent.ACTION_UP -> {
-                for (i in unitButtons){
-                    i.type.value=1
+                for (i in unitButtonsMap){
+                    i.value.type.value=1
                 }
-                for (i in buildButtons){
-                    i.type.value=1
+                for (i in buildButtonMap){
+                    i.value.type.value=1
                 }
 
                 val mx = event.x.toInt()
                 val my = event.y.toInt()
 
                 if (delivereUnit){
-                    for (i in unitButtons.indices){
-                        if (unitButtons[i].click(mx,my)){
-                            strengthAddUnit = i
-                            unitButtons[i].type.value=2
+                    for (i in unitButtonsMap){
+                        if (i.value.click(mx,my)){
+                            selectAddUnit = i.key
+                            i.value.type.value=2
                             break
                         }
                     }
                 }
 
                 if (delivereBuild){
-                    for (i in buildButtons.indices){
-                        if (buildButtons[i].click(mx,my)){
-                            selectAddBulid = i
-                            buildButtons[i].type.value=2
+                    for (i in buildButtonMap){
+                        if (i.value.click(mx,my)){
+                            selectAddBulid = i.key
+                            i.value.type.value=2
                             break
                         }
                     }
@@ -245,11 +303,21 @@ class Player(
 
                 if (buildSettings.click(mx,my)){
                     delivereBuild = !delivereBuild // if (true) false else true
+                    if (delivereBuild){
+                        selectAddBulid= Terrain.FARM
+                        val a = buildButtonMap.getValue(selectAddBulid)
+                        a.type.value=2
+                    }
                     delivereUnit = false
                 }
 
                 if (unitSettings.click(mx,my)) {
                     delivereUnit = !delivereUnit // if (true) false else true
+                    if (delivereUnit){
+                        selectAddUnit= Terrain.UNIT1
+                        val a = unitButtonsMap.getValue(selectAddUnit)
+                        a.type.value=2
+                    }
                     delivereBuild = false
                 }
 
@@ -262,7 +330,9 @@ class Player(
     fun Render()
     {
         val updateRender = touchRender
-        val context = LocalContext.current
+
+
+        /*
         val imageBitmapsUnits = remember {
             image_mass_units.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
@@ -273,36 +343,52 @@ class Player(
             image_mass_builds.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
             }
-        }
+        }*/
+
+
 
         val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
 
         Log.d("","render")
 
         // Создаем TextMeasurer
-        val textMeasurer = rememberTextMeasurer()
+        //val textMeasurer = rememberTextMeasurer()
 
         unitSettings.Render()
         buildSettings.Render()
 
         if (delivereUnit==true){
-            for (i in unitButtons){
-                i.Render()
+            for (i in unitButtonsMap){
+                i.value.Render()
             }
         }
         if (delivereBuild==true){
-            for (i in buildButtons){
-                i.Render()
+            for (i in buildButtonMap){
+                i.value.Render()
             }
         }
 
+       // val images = getImages()
         Canvas(modifier = Modifier.fillMaxSize()) {
-            RenderUnits(imageBitmapsUnits)
-            RenderFarms(imageBitmapsBuilds)
+            RenderUnits()
+            RenderFarms()
             RenderPossibleMoves(transparentHexagonBitmap)
             RenderPossibleCellBuild(transparentHexagonBitmap)
         }
     }
+
+    /*@Composable
+    fun getImages(): HashMap<Int, ImageBitmap> {
+        val context = LocalContext.current
+        var images=HashMap<Int, ImageBitmap>()
+        for (i in image_mass){
+            if (i.value != -1) {
+                images[i.value] =
+                    BitmapFactory.decodeResource(context.resources, i.value).asImageBitmap()
+            }
+        }
+        return images
+    }*/
 
     fun DrawScope.RenderPossibleMoves(possibleBitmap: ImageBitmap)
     {
@@ -313,7 +399,7 @@ class Player(
 
             // Преобразуем возможные ходы в пары Pair
             val possibleMovesSet = possibleMoves.map { Pair(it.x, it.y) }
-
+            println(possibleMovesSet)
             for (i in pole.mass.indices) {
                 for (j in pole.mass[i].indices) {
                     // Проверяем, что клетка НЕ входит в possibleMoves
@@ -325,39 +411,54 @@ class Player(
             }
         }
     }
-
     fun DrawScope.RenderPossibleCellBuild(possibleBitmap: ImageBitmap){
         if (delivereBuild || delivereUnit){
             for (i in pole.mass.indices){
                 for (j in pole.mass[i].indices){
-                    if (pole.mass[i][j].player != this@Player || pole.mass[i][j].occupied) {
-                        this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap)
+                    if (pole.mass[i][j].player == this@Player && isValidMove(koorOnInt(i,j))) {
+                        continue
                     }
+                    this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap)
                 }
             }
         }
     }
-    fun DrawScope.RenderFarms(imageBitmapsBuilds: List<ImageBitmap>)
+
+
+    fun DrawScope.RenderFarms()
     {
         for (i in buildings.indices){
-            val number=buildings[i].type
-            if (number in imageBitmapsBuilds.indices){
-                this.RenderImage(buildings[i].koorOnPole.x,buildings[i].koorOnPole.y, pole.dx,pole.dx, imageBitmapsBuilds[number])
+            val image=image_mass.getValue(buildings[i].type)
+
+            if (image!=null) {
+                this.RenderImage(
+                    buildings[i].koorOnPole.x,
+                    buildings[i].koorOnPole.y,
+                    pole.dx,
+                    pole.dx,
+                    image
+                )
             }
         }
     }
 
-    fun DrawScope.RenderUnits(imageBitmaps: List<ImageBitmap>)
+    fun DrawScope.RenderUnits()
     {
         for (i in units.indices){
-            val number=units[i].strength
+            println(units[i].type)
+            if (!image_mass.containsKey(units[i].type)) {
+                continue
+            }
 
-            if (number in imageBitmaps.indices) {
+                val image=image_mass.getValue(units[i].type)
+
+            if (image!=null) {
                 var scale=0
                 if (selectedUnit!=null && i==selectedUnit){
                     scale=50
                 }
-                this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,imageBitmaps[number],scale)
+                this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,image,scale)
+
             }
         }
     }
@@ -383,12 +484,16 @@ class Player(
         )
     }
 
-    fun addUnit(x: Int, y: Int, strength: Int, size: Int){
-        units.add(Unit(koorOnInt(x,y),strength,size, true))
+    fun addUnit(x: Int, y: Int, type: Terrain, size: Int){
+        if (isValidMove(koorOnInt(x,y))) {
+            units.add(Unit(koorOnInt(x, y), type, size, true))
+        }
     }
 
-    fun addBuild(x: Int, y: Int, type: Int){
-        buildings.add(Build(koorOnInt(x,y),type))
+    fun addBuild(x: Int, y: Int, type: Terrain){
+        if (isValidMove(koorOnInt(x,y))) {
+            buildings.add(Build(koorOnInt(x, y), type))
+        }
     }
 
     fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit): List<koorOnInt>
@@ -441,19 +546,20 @@ class Player(
 
         // Создаем mutable список с текущей позицией
         val allMoves = mutableListOf(koorOnInt(X, Y))
+        allMoves.addAll(movesAround)
 
         // Добавляем отфильтрованные ходы вокруг
-        allMoves.addAll(movesAround.filter { move ->
+        //allMoves.addAll(movesAround.filter { move ->
             // Находим юнита на этой позиции (если есть)
-            val unitAtCell = units.find { it.koorOnPole.x == move.x && it.koorOnPole.y == move.y }
+            //val unitAtCell = units.find { it.koorOnPole.x == move.x && it.koorOnPole.y == move.y }
 
             // Если юнита нет - клетка доступна
-            if (unitAtCell == null) return@filter true
+            //if (unitAtCell == null) return@filter true
 
             // Если есть юнит и он слабее текущего - клетка доступна для атаки
             // Если юнит сильнее или равен по силе - клетка недоступна
-            currentUnit1.strength > unitAtCell.strength
-        })
+            //currentUnit1.strength > unitAtCell.strength
+        //})
 
         // возращаем все возможные ходы
         return allMoves
@@ -467,7 +573,20 @@ class Player(
             return false
         }
         // Проверяем, что не вода
-        if (pole.mass[koorOnInt.x][koorOnInt.y].player?.color == Terrain.WATER.value) {
+        if (pole.mass[koorOnInt.x][koorOnInt.y].land == Terrain.WATER) {
+            return false
+        }
+
+        val koorPairUnits = units.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
+        println(koorPairUnits)
+
+        if (Pair(koorOnInt.x, koorOnInt.y) in koorPairUnits) {
+            return false
+        }
+
+        val koorPairBuild = buildings.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
+
+        if (Pair(koorOnInt.x, koorOnInt.y) in koorPairBuild) {
             return false
         }
 

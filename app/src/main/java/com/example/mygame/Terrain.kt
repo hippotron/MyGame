@@ -1,13 +1,17 @@
 package com.example.mygame
 
-enum class Terrain(val value: Int) {
-    WATER(-1),
-    FARM(0),
-    TOWER(1),
-    HARD_TOWER(2);
-    companion object {
-        fun fromValue(value: Int): Terrain? {
-            return values().find { it.value == value }
-        }
-    }
+enum class Terrain(val value: Int){
+    NONE(0),
+    WATER(1),
+    LAND(2),
+
+    FARM(3),
+    TOWER(4),
+    HARD_TOWER(5),
+
+    UNIT1(6),
+    UNIT2(7),
+    UNIT3(8),
+    UNIT4(9),
+
 }

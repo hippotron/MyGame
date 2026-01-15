@@ -17,7 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 class Unit(
 
     var koorOnPole: koorOnInt,
-    var strength: Int = 0,
+    var type: Terrain,
     initialSize: Int = 60,
     var canMove: Boolean
 ) {

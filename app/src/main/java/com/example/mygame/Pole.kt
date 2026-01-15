@@ -82,8 +82,9 @@ class Pole(
             MutableList(height) { col ->
                 Cell(
                     player = null,
-                    occupied = false,
-                    protection = 0
+                    land = Terrain.LAND
+                    //occupied = false,
+                    //protection = 0
                 )
             }
         }
