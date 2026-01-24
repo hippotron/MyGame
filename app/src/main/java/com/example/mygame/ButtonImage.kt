@@ -24,14 +24,14 @@ class ButtonImage(
     val dy: Int,
     val name: Int,
     val name2: Int = name,
-    var type: MutableState<Int> = mutableStateOf(1)  // Используем State
+    var type: MutableState<Boolean> = mutableStateOf(false)  // Используем State
 ) {
     @Composable
     fun Render() {
         // эта строка получает доступ к контексту, он необходим для доступа к картинкам
         // val context = LocalContext.current
 
-        val image = if (type.value == 1)
+        val image = if (type.value == false)
             ImageBitmap.imageResource(id = name)
         else
             ImageBitmap.imageResource(id = name2)

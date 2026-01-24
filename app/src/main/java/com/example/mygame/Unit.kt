@@ -12,14 +12,16 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 
 class Unit(
 
     var koorOnPole: koorOnInt,
     var type: Terrain,
-    initialSize: Int = 60,
-    var canMove: Boolean
+    Size: Int = 60,
+    //var canMove: Boolean,
+    var Movement: Int = 2
 ) {
-    var size: MutableState<Int> = mutableStateOf(initialSize)
+    var size: MutableState<Int> = mutableIntStateOf(Size)
 }

@@ -12,6 +12,5 @@ enum class Terrain(val value: Int){
     UNIT1(6),
     UNIT2(7),
     UNIT3(8),
-    UNIT4(9),
-
+    UNIT4(9)
 }

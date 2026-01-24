@@ -70,6 +70,7 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
                     if (button_game.click(mx,my)==true){
                         //Log.d("","444")
                         game.CurrentScene="Game"
+
                     }
 
                     if (button_setting.click(mx,my)==true){
@@ -88,7 +89,7 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
             MotionEvent.ACTION_POINTER_DOWN -> {
                 if (event.pointerCount == 2) {
                     //Log.d("Touch", "Два пальца — второе касание")
-                    Log.d("","111")
+                    //Log.d("","111")
                 } else if (event.pointerCount > 2) {
                     //Log.d("Touch", "Больше двух пальцев")
                 }

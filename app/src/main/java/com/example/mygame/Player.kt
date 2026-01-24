@@ -1,6 +1,7 @@
 package com.example.mygame
 
-import android.util.Log
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.example.mygame.GlobalParam.GlobalDxKoef
+import com.example.mygame.GlobalParam.RenderImage
 import com.example.mygame.ui.theme.Economic
 
 class Player(
@@ -24,127 +27,25 @@ class Player(
     val pole: Pole,
     var color: Int,
     val economic: HashMap<Terrain, Economic>,
-    val image_mass: HashMap<Terrain, ImageBitmap>
+    val image_mass: HashMap<Terrain, ImageBitmap>,
+    val gameScene: GameScene,
+    val context: Context
 ) {
 
 
     // Используем mutableStateListOf для автоматического обновления
-    val units = mutableStateListOf<Unit>( )
-
-    val buildings = mutableListOf<Build>()
-
+    val units = mutableStateListOf<Unit>()
+    val buildings = mutableStateListOf<Build>()
     var selectedUnit by mutableStateOf<Int?>(null)
-
     var touchRender by mutableStateOf(0)
-
-    var delivereUnit = false
-    var delivereBuild = false
-
-    var selectAddUnit: Terrain = Terrain.NONE
-    var selectAddBulid: Terrain = Terrain.NONE
-
-    val buildSettings = ButtonImage(
-        (pole.display.x*0.29).toInt(),
-        (pole.display.y*0.89).toInt(),
-        (pole.display.x*0.21).toInt(),
-        (pole.display.y*0.1).toInt(),
-        R.drawable.farm)
-
-    val unitSettings = ButtonImage(
-        (pole.display.x*0.6).toInt(),
-        (pole.display.y*0.9).toInt(),
-        (pole.display.x*0.21).toInt(),
-        (pole.display.y*0.09).toInt(),
-        R.drawable.skeleton)
-
-    var unitButtonsMap= HashMap<Terrain, ButtonImage>()
-    var buildButtonMap = HashMap<Terrain, ButtonImage>()
 
     var kazna by mutableStateOf(0)
     var income by mutableStateOf(0)
-    var sale by  mutableStateOf(0)
+    var sale by mutableStateOf(0)
 
 
     init {
-        initButtonUnit()
-        initButtonBuild()
-    }
 
-    fun initButtonUnit() {
-        val b1 =
-            ButtonImage(
-                (pole.display.x * 0.15).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150,
-                150,
-                R.drawable.skeleton,
-                name2 = R.drawable.dedicated_skeleton,
-                type = mutableStateOf(1)
-            )
-        unitButtonsMap[Terrain.UNIT1]=b1
-
-        val b2 = ButtonImage(
-            (pole.display.x * 0.35).toInt(),
-            (pole.display.y * 0.85).toInt(),
-            150, 150,
-            R.drawable.barbarian,
-            name2 = R.drawable.dedicated_barbarin,
-            type = mutableStateOf(1)
-        )
-        unitButtonsMap[Terrain.UNIT2]=b2
-        val b3 =
-            ButtonImage(
-                (pole.display.x * 0.55).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150, 150,
-                R.drawable.knight,
-                name2 = R.drawable.dedicated_knight,
-                type = mutableStateOf(1)
-            )
-        unitButtonsMap[Terrain.UNIT3]=b3
-        val b4 =
-            ButtonImage(
-                (pole.display.x * 0.75).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150, 150,
-                R.drawable.hard_khight,
-                name2 = R.drawable.dedicated_hard_knight,
-                type = mutableStateOf(1)
-            )
-        unitButtonsMap[Terrain.UNIT4]=b4
-    }
-
-    fun initButtonBuild() {
-        val b1 =
-            ButtonImage(
-                (pole.display.x * 0.25).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150, 150,
-                R.drawable.farm,
-                name2 = R.drawable.dedicated_farm,
-                type = mutableStateOf(1)
-            )
-        buildButtonMap[Terrain.FARM]=b1
-        val b2 =
-            ButtonImage(
-                (pole.display.x * 0.45).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150, 150,
-                R.drawable.tower,
-                name2 = R.drawable.dedicated_tower,
-                type = mutableStateOf(1)
-            )
-        buildButtonMap[Terrain.TOWER]=b2
-        val b3 =
-            ButtonImage(
-                (pole.display.x * 0.65).toInt(),
-                (pole.display.y * 0.85).toInt(),
-                150, 150,
-                R.drawable.tower_hard,
-                name2 = R.drawable.tower_hard,
-                type = mutableStateOf(1)
-            )
-        buildButtonMap[Terrain.HARD_TOWER]=b3
     }
 
     fun getKazna(){
@@ -190,60 +91,62 @@ class Player(
 
         val cell = economic[Terrain.LAND]?.income ?: 0
         val farm = economic[Terrain.FARM]?.income ?: 0
+
         income = sumCells * cell + sumFarm*farm
 
     }
 
-    fun onTouch(event: MotionEvent)
-    {
+    fun onTouch(event: MotionEvent) {
         getIncome()
-        when (event.actionMasked)
-        {
+        getSale()
+        println("when")
+        when (event.actionMasked) {
+
             MotionEvent.ACTION_DOWN -> {
+                val (massX, massY) = Search_massY_massY(event.x, event.y)
 
-                //strengthAddUnit = if (strengthAddUnit!=0) strengthAddUnit else 0
-                //selectAddBulid = if (selectAddBulid!=0) selectAddBulid else 0
-
-                val (massX, massY) = Search_massY_massY(event.x,event.y)
-
-                if (massX != null && massY != null){
-                    if (!delivereBuild) {
-                        if (!delivereUnit) {
-                            if (selectedUnit != null && units[selectedUnit!!].canMove/* ==true */ ) {
-
+                if (massX != null && massY != null) {
+                    // Проверяем глобальные состояния из GameScene
+                    if (!gameScene.delivereBuild) {
+                        if (!gameScene.delivereUnit) {
+                            // Обработка выбора и перемещения юнитов
+                            if (selectedUnit != null && units[selectedUnit!!].Movement != 0) {
                                 val possibleMoves = Possible_moves(
                                     units[selectedUnit!!].koorOnPole.x,
                                     units[selectedUnit!!].koorOnPole.y,
-                                    2,
+                                    1,
                                     units[selectedUnit!!]
                                 )
                                 for (i in possibleMoves.indices) {
                                     if (massX == possibleMoves[i].x && massY == possibleMoves[i].y) {
-
-                                        if (units[selectedUnit!!].koorOnPole.x==massX &&
-                                                units[selectedUnit!!].koorOnPole.y==massY) {
-                                            units[selectedUnit!!].canMove = true
-                                        } else {
-                                            units[selectedUnit!!].canMove = false
+                                        if (massX == units[selectedUnit!!].koorOnPole.x &&
+                                            massY == units[selectedUnit!!].koorOnPole.y
+                                        ) {
+                                            units[selectedUnit!!].size.value = pole.dx
+                                            selectedUnit = null
+                                            break
                                         }
+                                        deleteUnit(massX, massY)
+                                        deleteBuild(massX, massY)
 
-                                        //pole.mass[units[selectedUnit!!].koorOnPole.x][units[selectedUnit!!].koorOnPole.y].occupied = false
                                         units[selectedUnit!!].koorOnPole.x = massX
                                         units[selectedUnit!!].koorOnPole.y = massY
-
+                                        units[selectedUnit!!].Movement = units[selectedUnit!!].Movement - 1
                                         pole.mass[massX][massY].player = this
-                                       // pole.mass[massX][massY].occupied = true
 
                                         units[selectedUnit!!].size.value = pole.dx
-
                                         selectedUnit = null
                                         break
                                     }
                                 }
                             } else { // selectedUnit == null
+                                println("else")
                                 for (i in units.indices) {
+                                    println("unit "+i)
                                     if (massX == units[i].koorOnPole.x && massY == units[i].koorOnPole.y) {
-                                        if (units[i].canMove) {
+                                        println("massX==x")
+                                        if (units[i].Movement != 0) {
+                                            println("movement!=0")
                                             selectedUnit = i
                                             units[i].size.value = pole.dx + pole.dx / 2
                                             break
@@ -251,179 +154,59 @@ class Player(
                                     }
                                 }
                             }
-                        } else { //delivereUnit == true
-                            //if (pole.mass[massX][massY].player==this && !pole.mass[massX][massY].occupied) {
-                                addUnit(massX, massY, selectAddUnit, pole.dx)
-                                pole.mass[massX][massY].player=this
-                            //}
-                            selectAddUnit = Terrain.UNIT1
-                            delivereUnit = false
+                        } else { // delivereUnit == true (из GameScene)
+                            if (pole.mass[massX][massY].player == this) {
+                                // Используем selectAddUnit из GameScene
+                                addUnit(massX, massY, gameScene.selectAddUnit, pole.dx)
+                            }
                         }
-                    } else{
-                        if (pole.mass[massX][massY].player==this) {
-                            addBuild(massX, massY, selectAddBulid)
-                        }
-                        selectAddBulid = Terrain.NONE
-                        delivereBuild = false
-                    }
-                }
-                //touchRender++
-            }
-
-            MotionEvent.ACTION_UP -> {
-                for (i in unitButtonsMap){
-                    i.value.type.value=1
-                }
-                for (i in buildButtonMap){
-                    i.value.type.value=1
-                }
-
-                val mx = event.x.toInt()
-                val my = event.y.toInt()
-
-                if (delivereUnit){
-                    for (i in unitButtonsMap){
-                        if (i.value.click(mx,my)){
-                            selectAddUnit = i.key
-                            i.value.type.value=2
-                            break
+                    } else { // delivereBuild == true (из GameScene)
+                        if (pole.mass[massX][massY].player == this) {
+                            // Используем selectAddBulid из GameScene
+                            addBuild(massX, massY, gameScene.selectAddBulid)
                         }
                     }
                 }
-
-                if (delivereBuild){
-                    for (i in buildButtonMap){
-                        if (i.value.click(mx,my)){
-                            selectAddBulid = i.key
-                            i.value.type.value=2
-                            break
-                        }
-                    }
-                }
-
-                if (buildSettings.click(mx,my)){
-                    delivereBuild = !delivereBuild // if (true) false else true
-                    if (delivereBuild){
-                        selectAddBulid= Terrain.FARM
-                        val a = buildButtonMap.getValue(selectAddBulid)
-                        a.type.value=2
-                    }
-                    delivereUnit = false
-                }
-
-                if (unitSettings.click(mx,my)) {
-                    delivereUnit = !delivereUnit // if (true) false else true
-                    if (delivereUnit){
-                        selectAddUnit= Terrain.UNIT1
-                        val a = unitButtonsMap.getValue(selectAddUnit)
-                        a.type.value=2
-                    }
-                    delivereBuild = false
-                }
-
                 touchRender++
             }
         }
     }
 
     @Composable
-    fun Render()
+    fun Render(renderPlayerIndicator: Boolean)
     {
         val updateRender = touchRender
-
-
-        /*
-        val imageBitmapsUnits = remember {
-            image_mass_units.map { resourceId ->
-                BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
-            }
-        }
-
-        val imageBitmapsBuilds = remember {
-            image_mass_builds.map { resourceId ->
-                BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
-            }
-        }*/
-
-
-
         val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
 
-        Log.d("","render")
-
-        // Создаем TextMeasurer
-        //val textMeasurer = rememberTextMeasurer()
-
-        unitSettings.Render()
-        buildSettings.Render()
-
-        if (delivereUnit==true){
-            for (i in unitButtonsMap){
-                i.value.Render()
-            }
-        }
-        if (delivereBuild==true){
-            for (i in buildButtonMap){
-                i.value.Render()
-            }
-        }
-
-       // val images = getImages()
         Canvas(modifier = Modifier.fillMaxSize()) {
-            RenderUnits()
+            RenderUnits(renderPlayerIndicator)
             RenderFarms()
             RenderPossibleMoves(transparentHexagonBitmap)
-            RenderPossibleCellBuild(transparentHexagonBitmap)
+
         }
     }
 
-    /*@Composable
-    fun getImages(): HashMap<Int, ImageBitmap> {
-        val context = LocalContext.current
-        var images=HashMap<Int, ImageBitmap>()
-        for (i in image_mass){
-            if (i.value != -1) {
-                images[i.value] =
-                    BitmapFactory.decodeResource(context.resources, i.value).asImageBitmap()
-            }
-        }
-        return images
-    }*/
-
     fun DrawScope.RenderPossibleMoves(possibleBitmap: ImageBitmap)
     {
-        if (selectedUnit != null) {
+        if (selectedUnit != null && !gameScene.delivereUnit && !gameScene.delivereBuild ) {
+            println("1")
             val selectedX = units[selectedUnit!!].koorOnPole.x
             val selectedY = units[selectedUnit!!].koorOnPole.y
-            val possibleMoves = Possible_moves(selectedX, selectedY, 2, units[selectedUnit!!])
+            val possibleMoves = Possible_moves(selectedX, selectedY, 1, units[selectedUnit!!])
 
             // Преобразуем возможные ходы в пары Pair
             val possibleMovesSet = possibleMoves.map { Pair(it.x, it.y) }
-            println(possibleMovesSet)
             for (i in pole.mass.indices) {
                 for (j in pole.mass[i].indices) {
                     // Проверяем, что клетка НЕ входит в possibleMoves
                     if (Pair(i, j) !in possibleMovesSet) {
                         // прозначный шестигранник
-                        this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap)
+                        this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap,pole = pole)
                     }
                 }
             }
         }
     }
-    fun DrawScope.RenderPossibleCellBuild(possibleBitmap: ImageBitmap){
-        if (delivereBuild || delivereUnit){
-            for (i in pole.mass.indices){
-                for (j in pole.mass[i].indices){
-                    if (pole.mass[i][j].player == this@Player && isValidMove(koorOnInt(i,j))) {
-                        continue
-                    }
-                    this.RenderImage(i,j,pole.dx,pole.dx,possibleBitmap)
-                }
-            }
-        }
-    }
-
 
     fun DrawScope.RenderFarms()
     {
@@ -436,16 +219,16 @@ class Player(
                     buildings[i].koorOnPole.y,
                     pole.dx,
                     pole.dx,
-                    image
+                    image,
+                    pole = pole
                 )
             }
         }
     }
 
-    fun DrawScope.RenderUnits()
+    fun DrawScope.RenderUnits(renderPlayerIndicator: Boolean)
     {
         for (i in units.indices){
-            println(units[i].type)
             if (!image_mass.containsKey(units[i].type)) {
                 continue
             }
@@ -455,55 +238,146 @@ class Player(
             if (image!=null) {
                 var scale=0
                 if (selectedUnit!=null && i==selectedUnit){
-                    scale=50
+                    scale=(pole.dx/2).toInt()
                 }
-                this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,image,scale)
+                /*
+                this.TextRender(textMeasurer,
+                    units[i].Movement.toString(),
+                    (pole.poleX+units[i].koorOnPole.x*pole.dx*GlobalDxKoef).toInt(),
+                    pole.poleY+units[i].koorOnPole.y*pole.dx,
+                    25)
+                */
 
+                this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,image,scale, pole = pole)
+
+                if (renderPlayerIndicator) {
+                    var imageIndicator = BitmapFactory.decodeResource(
+                        context.resources,
+                        R.drawable.movement_indicator_full
+                    ).asImageBitmap()
+
+                    if (units[i].Movement == 1) {
+                        imageIndicator = BitmapFactory.decodeResource(
+                            context.resources,
+                            R.drawable.movement_indicator_half
+                        ).asImageBitmap()
+                    } else if (units[i].Movement <= 0) {
+                        imageIndicator = BitmapFactory.decodeResource(
+                            context.resources,
+                            R.drawable.movement_indicators_zero
+                        ).asImageBitmap()
+                    }
+                    this.RenderImage(
+                        units[i].koorOnPole.x,
+                        units[i].koorOnPole.y,
+                        pole.dx,
+                        (pole.dx * 0.1).toInt(),
+                        imageIndicator,
+                        0,
+                        0,
+                        pole.dx,
+                        pole = pole
+                    )
+                }
+            }
+        }
+    }
+/*
+    fun DrawScope.RenderImage(i: Int, j: Int, lx: Int, ly: Int, imageBitmap: ImageBitmap, scale:Int=0, plusX: Int=0, plusY: Int=0)
+    {
+        var l = 0
+        if (i % 2 != 0) {
+            l = pole.dx / 2
+        }
+        val posX = (pole.poleX + i * (lx * GlobalDxKoef)).toInt()
+        val posY = (pole.poleY + j * pole.dx + l).toInt()
+
+        drawImage(
+            image = imageBitmap,
+            dstOffset = IntOffset(posX-scale/2+plusX, posY-scale/2+plusY),
+            dstSize = IntSize(lx+scale, ly+scale)
+        )
+    }
+*/
+    fun deleteUnit(massX: Int, massY: Int){
+        if (isValidMoveForUnit(massX,massY, selectedUnit)){
+            for (player in gameScene.listPlayers){
+                if (player!=this){
+                    for (vragUnit in player.units.indices){
+                        if (player.units[vragUnit].koorOnPole.x==massX && player.units[vragUnit].koorOnPole.y==massY){
+                            player.units.removeAt(vragUnit)
+                            //println("юнит убит")
+                            break
+                        }
+                    }
+                }
             }
         }
     }
 
-    fun DrawScope.RenderImage(i : Int, j : Int, lx : Int, ly : Int, imageBitmap : ImageBitmap, scale :Int = 0, trDX: Int = 0)
+    fun deleteBuild(massX: Int,massY: Int){
+        if (isValidForBuild(massX,massY,selectedUnit!!)){
+            for (player in gameScene.listPlayers){
+                if (player!=this){
+                    for (vragBuild in player.buildings.indices){
+                        if (player.buildings[vragBuild].koorOnPole.x == massX && player.buildings[vragBuild].koorOnPole.y == massY){
+                            player.buildings.removeAt(vragBuild)
+                            //println("здание уничтожено")
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun isValidForBuild(x: Int,y: Int,selectUnit: Int?): Boolean{
+        for (player in gameScene.listPlayers){
+            if (player!=this){
+                for (vragBuild in player.buildings){
+                    if (vragBuild.koorOnPole.x == x && vragBuild.koorOnPole.y == y){
+                        if (vragBuild.type>units[selectUnit!!].type){
+                            return false
+                        }
+                    }
+                }
+            }
+        }
+
+        return true
+    }
+
+    fun addUnit(x: Int, y: Int, type: Terrain, size: Int)
     {
-        var l = 0
-        if (i % 2 != 0) {
-            l = ly / 2
-        }
-        var posX = (pole.poleX + i * (lx * GlobalDxKoef)).toInt()
-        val posY = (pole.poleY + j * ly + l).toInt()
-        var finallLx = lx
-        if ( trDX!= 0){
-            finallLx = trDX
-            posX = (posX+pole.dx*0.7).toInt()
-        }
+        val unitType = economic.getValue(type)
+        if (kazna - unitType.price >= 0 && isValidMove(koorOnInt(x, y))) {
+            units.add(Unit(koorOnInt(x, y), type, size, 2))
 
-        drawImage(
-            image = imageBitmap,
-            dstOffset = IntOffset(posX-scale/2, posY-scale/2),
-            dstSize = IntSize(finallLx+scale, ly+scale)
-        )
-    }
-
-    fun addUnit(x: Int, y: Int, type: Terrain, size: Int){
-        if (isValidMove(koorOnInt(x,y))) {
-            units.add(Unit(koorOnInt(x, y), type, size, true))
+            kazna -= unitType.price
+            gameScene.delivereUnit=false
         }
     }
 
-    fun addBuild(x: Int, y: Int, type: Terrain){
-        if (isValidMove(koorOnInt(x,y))) {
+    fun addBuild(x: Int, y: Int, type: Terrain)
+    {
+        val bulidType = economic.getValue(type)
+        if (kazna - bulidType.price >= 0 && isValidMove(koorOnInt(x,y))) {
             buildings.add(Build(koorOnInt(x, y), type))
+            kazna -= bulidType.price
+            gameScene.delivereBuild=false
         }
     }
 
-    fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit): List<koorOnInt>
+    fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit?): List<koorOnInt>
     {
-
+        if ((currentUnit1?.Movement ?: 1) <= 0){
+            return mutableListOf()
+        }
         // Массив вообще всех возможных ходов
-        val movesAround = mutableSetOf<koorOnInt>() // Set убирает дубликаты
+        val movesAround = mutableSetOf<koorOnInt>() // Set убирает дубликаты around - вокруг
 
         // Получаем возможные ходы вокруг
-        val directMoves = mutableListOf<koorOnInt>()
+        val verifiedMoves = mutableListOf<koorOnInt>() // verified - проверенные
         val move =  mutableListOf<koorOnInt>()
 
         move.add(koorOnInt(X-1, Y))
@@ -519,16 +393,17 @@ class Player(
         }
 
         for (i in move){
-            if (isValidMove(i)){
-                directMoves.add(i)
+
+            if (isValidMove(i,selectedUnit!!)){
+                verifiedMoves.add(i)
             }
         }
         // Добавляем возможные ходы вокруг ко всем
-        movesAround.addAll(directMoves)
+        movesAround.addAll(verifiedMoves)
 
         if (N > 1) {
             // делаем цикл по возможным ходам вокруг
-            for (move in directMoves) {
+            for (move in verifiedMoves) {
                 // получаем возможные ходы от возможного move хода
                 val recursiveMoves = Possible_moves(move.x, move.y, N - 1, currentUnit1)
                 // добавляем эти возможные ходы ко всем возможным ходам
@@ -548,25 +423,12 @@ class Player(
         val allMoves = mutableListOf(koorOnInt(X, Y))
         allMoves.addAll(movesAround)
 
-        // Добавляем отфильтрованные ходы вокруг
-        //allMoves.addAll(movesAround.filter { move ->
-            // Находим юнита на этой позиции (если есть)
-            //val unitAtCell = units.find { it.koorOnPole.x == move.x && it.koorOnPole.y == move.y }
-
-            // Если юнита нет - клетка доступна
-            //if (unitAtCell == null) return@filter true
-
-            // Если есть юнит и он слабее текущего - клетка доступна для атаки
-            // Если юнит сильнее или равен по силе - клетка недоступна
-            //currentUnit1.strength > unitAtCell.strength
-        //})
-
         // возращаем все возможные ходы
         return allMoves
     }
 
-    // Вспомогательная функция для проверки клетки
-    fun isValidMove(koorOnInt: koorOnInt): Boolean
+    // Функция длч проверки клетки #isValidMove - действительный ход
+    fun isValidMove(koorOnInt: koorOnInt, selectUnit: Int?=null): Boolean
     {
         // Проверяем границы массива
         if (koorOnInt.x < 0 || koorOnInt.x >= pole.mass.size || koorOnInt.y < 0 || koorOnInt.y >= pole.mass[0].size) {
@@ -577,19 +439,56 @@ class Player(
             return false
         }
 
-        val koorPairUnits = units.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
-        println(koorPairUnits)
 
+
+        val koorPairUnits = units.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
         if (Pair(koorOnInt.x, koorOnInt.y) in koorPairUnits) {
             return false
         }
 
         val koorPairBuild = buildings.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
-
         if (Pair(koorOnInt.x, koorOnInt.y) in koorPairBuild) {
             return false
         }
 
+        if (selectUnit!=null) {
+            val unitTypeInt=economic.getValue(units[selectUnit].type).protection
+            if (pole.mass[koorOnInt.x][koorOnInt.y].player != this &&
+                    pole.mass[koorOnInt.x][koorOnInt.y].protection>unitTypeInt){
+                return false
+            }
+
+            for (player in gameScene.listPlayers) {
+                if (player != this) {
+                    for (vragUnit in player.units) {
+                        if (vragUnit.koorOnPole.x == koorOnInt.x && vragUnit.koorOnPole.y == koorOnInt.y) {
+                            if (vragUnit.type > units[selectUnit].type) {
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true
+    }
+
+    fun isValidMoveForUnit(x: Int, y: Int, selectUnit: Int?=null): Boolean
+    {
+        if (selectUnit!=null) {
+            for (player in gameScene.listPlayers) {
+                if (player != this) {
+                    for (vragUnit in player.units) {
+                        if (vragUnit.koorOnPole.x == x && vragUnit.koorOnPole.y == y) {
+                            if (vragUnit.type > units[selectUnit].type) {
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return true
     }
 

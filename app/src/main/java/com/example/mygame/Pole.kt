@@ -82,9 +82,8 @@ class Pole(
             MutableList(height) { col ->
                 Cell(
                     player = null,
+                    protection = 0,
                     land = Terrain.LAND
-                    //occupied = false,
-                    //protection = 0
                 )
             }
         }
@@ -115,7 +114,7 @@ class Pole(
 
     @Composable
     fun Render() {
-        Log.d("pole","$dx")
+        //Log.d("pole","$dx")
         drawHexagonPole() // рисует поле из шестиугольников
 
         //drawRectPole()// рисует поле из квадратов
@@ -342,7 +341,21 @@ class Pole(
                                     dstSize = IntSize(dx.toInt(), dx.toInt())
                                 )
                             }
+                            /*
+                            drawIntoCanvas { canvas ->
+                                val textPaint = android.graphics.Paint().apply {
+                                    color = android.graphics.Color.BLUE
+                                    textSize = dx * 0.4f // Размер текста адаптивный
+                                    textAlign = android.graphics.Paint.Align.CENTER
+                                }
 
+                                val textX = posX + dx / 2f
+                                val textY = posY + dx / 1.7f
+
+                                canvas.nativeCanvas.drawText("${mass[i][j].protection}", textX, textY, textPaint)
+                            }*/
+
+                            /*
                             // Рисуем текст с индексами i и j
                             drawIntoCanvas { canvas ->
                                 val textPaint = android.graphics.Paint().apply {
@@ -355,7 +368,7 @@ class Pole(
                                 val textY = posY + dx / 1.7f
 
                                 canvas.nativeCanvas.drawText("$i,$j", textX, textY, textPaint)
-                            }
+                            }*/
 
                         }
 
