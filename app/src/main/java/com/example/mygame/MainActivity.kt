@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         mapScene.put("Setting", SettingScene(gameEngine, this))
         mapScene.put("Authors", AuthorsScene(gameEngine, this))
 
-        gameEngine.CurrentScene = "Game"
+        gameEngine.CurrentScene = "Menu"
 
         // Можно вызывать любые @Composable функции
         setContent {

@@ -11,12 +11,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 
 class SettingScene(override var game: GameEngine,context: Context) : Scene {
-    override fun update() {
-
-    }
-
-    val X: Float = context.resources.configuration.screenHeightDp.toFloat()
-    val Y: Float = context.resources.configuration.screenWidthDp.toFloat()
 
     val displayMetrics = context.resources.displayMetrics
     val screenXpx = displayMetrics.widthPixels.toFloat()
@@ -47,10 +41,6 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
                 val mx = event.x.toInt()
                 val my = event.y.toInt()
 
-                //Log.d("","$screenXpx")
-                //Log.d("","$screenYpx")
-
-
                 if (event.pointerCount == 1) {
                     if (button_return.click(mx,my)==true){
                         //Log.d("","ttt")
@@ -62,12 +52,16 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
         }
     }
 
+    override fun update() {
+
+    }
+
     override fun onEnter() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onExit() {
-        TODO("Not yet implemented")
+
     }
 
 }

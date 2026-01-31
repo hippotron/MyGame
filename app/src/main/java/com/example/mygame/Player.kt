@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import com.example.mygame.GlobalParam.GlobalDxKoef
 import com.example.mygame.GlobalParam.RenderImage
 import com.example.mygame.ui.theme.Economic
@@ -99,71 +100,77 @@ class Player(
     fun onTouch(event: MotionEvent) {
         getIncome()
         getSale()
-        println("when")
+        //println("when")
         when (event.actionMasked) {
 
             MotionEvent.ACTION_DOWN -> {
-                val (massX, massY) = Search_massY_massY(event.x, event.y)
+                if (pole.ogranichenie.min.x<event.x && event.x < pole.ogranichenie.max.x &&
+                        pole.ogranichenie.min.y<event.y && event.y < pole.ogranichenie.max.y)
+                {
 
-                if (massX != null && massY != null) {
-                    // Проверяем глобальные состояния из GameScene
-                    if (!gameScene.delivereBuild) {
-                        if (!gameScene.delivereUnit) {
-                            // Обработка выбора и перемещения юнитов
-                            if (selectedUnit != null && units[selectedUnit!!].Movement != 0) {
-                                val possibleMoves = Possible_moves(
-                                    units[selectedUnit!!].koorOnPole.x,
-                                    units[selectedUnit!!].koorOnPole.y,
-                                    1,
-                                    units[selectedUnit!!]
-                                )
-                                for (i in possibleMoves.indices) {
-                                    if (massX == possibleMoves[i].x && massY == possibleMoves[i].y) {
-                                        if (massX == units[selectedUnit!!].koorOnPole.x &&
-                                            massY == units[selectedUnit!!].koorOnPole.y
-                                        ) {
+                    val (massX, massY) = Search_massY_massY(event.x, event.y)
+
+                    if (massX != null && massY != null) {
+                        // Проверяем глобальные состояния из GameScene
+                        if (!gameScene.delivereBuild) {
+                            if (!gameScene.delivereUnit) {
+                                // Обработка выбора и перемещения юнитов
+                                if (selectedUnit != null && units[selectedUnit!!].Movement != 0) {
+                                    val possibleMoves = Possible_moves(
+                                        units[selectedUnit!!].koorOnPole.x,
+                                        units[selectedUnit!!].koorOnPole.y,
+                                        1,
+                                        units[selectedUnit!!]
+                                    )
+                                    for (i in possibleMoves.indices) {
+                                        if (massX == possibleMoves[i].x && massY == possibleMoves[i].y) {
+                                            if (massX == units[selectedUnit!!].koorOnPole.x &&
+                                                massY == units[selectedUnit!!].koorOnPole.y
+                                            ) {
+                                                units[selectedUnit!!].size.value = pole.dx
+                                                selectedUnit = null
+                                                break
+                                            }
+                                            deleteUnit(massX, massY)
+                                            deleteBuild(massX, massY)
+
+                                            units[selectedUnit!!].koorOnPole.x = massX
+                                            units[selectedUnit!!].koorOnPole.y = massY
+                                            units[selectedUnit!!].Movement =
+                                                units[selectedUnit!!].Movement - 1
+                                            pole.mass[massX][massY].player = this
+
                                             units[selectedUnit!!].size.value = pole.dx
                                             selectedUnit = null
                                             break
                                         }
-                                        deleteUnit(massX, massY)
-                                        deleteBuild(massX, massY)
-
-                                        units[selectedUnit!!].koorOnPole.x = massX
-                                        units[selectedUnit!!].koorOnPole.y = massY
-                                        units[selectedUnit!!].Movement = units[selectedUnit!!].Movement - 1
-                                        pole.mass[massX][massY].player = this
-
-                                        units[selectedUnit!!].size.value = pole.dx
-                                        selectedUnit = null
-                                        break
                                     }
-                                }
-                            } else { // selectedUnit == null
-                                println("else")
-                                for (i in units.indices) {
-                                    println("unit "+i)
-                                    if (massX == units[i].koorOnPole.x && massY == units[i].koorOnPole.y) {
-                                        println("massX==x")
-                                        if (units[i].Movement != 0) {
-                                            println("movement!=0")
-                                            selectedUnit = i
-                                            units[i].size.value = pole.dx + pole.dx / 2
-                                            break
+                                } else { // selectedUnit == null
+                                    //println("else")
+                                    for (i in units.indices) {
+                                        //println("unit "+i)
+                                        if (massX == units[i].koorOnPole.x && massY == units[i].koorOnPole.y) {
+                                            //println("massX==x")
+                                            if (units[i].Movement != 0) {
+                                                //println("movement!=0")
+                                                selectedUnit = i
+                                                units[i].size.value = pole.dx + pole.dx / 2
+                                                break
+                                            }
                                         }
                                     }
                                 }
+                            } else { // delivereUnit == true (из GameScene)
+                                if (pole.mass[massX][massY].player == this && gameScene.selectAddUnit != Terrain.NONE) {
+                                    // Используем selectAddUnit из GameScene
+                                    addUnit(massX, massY, gameScene.selectAddUnit, pole.dx)
+                                }
                             }
-                        } else { // delivereUnit == true (из GameScene)
-                            if (pole.mass[massX][massY].player == this) {
-                                // Используем selectAddUnit из GameScene
-                                addUnit(massX, massY, gameScene.selectAddUnit, pole.dx)
+                        } else { // delivereBuild == true (из GameScene)
+                            if (pole.mass[massX][massY].player == this && gameScene.selectAddBulid != Terrain.NONE) {
+                                // Используем selectAddBulid из GameScene
+                                addBuild(massX, massY, gameScene.selectAddBulid)
                             }
-                        }
-                    } else { // delivereBuild == true (из GameScene)
-                        if (pole.mass[massX][massY].player == this) {
-                            // Используем selectAddBulid из GameScene
-                            addBuild(massX, massY, gameScene.selectAddBulid)
                         }
                     }
                 }
@@ -189,7 +196,7 @@ class Player(
     fun DrawScope.RenderPossibleMoves(possibleBitmap: ImageBitmap)
     {
         if (selectedUnit != null && !gameScene.delivereUnit && !gameScene.delivereBuild ) {
-            println("1")
+            //println("1")
             val selectedX = units[selectedUnit!!].koorOnPole.x
             val selectedY = units[selectedUnit!!].koorOnPole.y
             val possibleMoves = Possible_moves(selectedX, selectedY, 1, units[selectedUnit!!])
@@ -300,7 +307,7 @@ class Player(
     }
 */
     fun deleteUnit(massX: Int, massY: Int){
-        if (isValidMoveForUnit(massX,massY, selectedUnit)){
+        if (isValidMoveForUnit(massX,massY, selectedUnit!!)){
             for (player in gameScene.listPlayers){
                 if (player!=this){
                     for (vragUnit in player.units.indices){
@@ -360,6 +367,7 @@ class Player(
 
     fun addBuild(x: Int, y: Int, type: Terrain)
     {
+
         val bulidType = economic.getValue(type)
         if (kazna - bulidType.price >= 0 && isValidMove(koorOnInt(x,y))) {
             buildings.add(Build(koorOnInt(x, y), type))
@@ -439,8 +447,6 @@ class Player(
             return false
         }
 
-
-
         val koorPairUnits = units.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
         if (Pair(koorOnInt.x, koorOnInt.y) in koorPairUnits) {
             return false
@@ -452,10 +458,21 @@ class Player(
         }
 
         if (selectUnit!=null) {
-            val unitTypeInt=economic.getValue(units[selectUnit].type).protection
-            if (pole.mass[koorOnInt.x][koorOnInt.y].player != this &&
-                    pole.mass[koorOnInt.x][koorOnInt.y].protection>unitTypeInt){
-                return false
+            val unitTypeInt = economic.getValue(units[selectUnit].type).protection
+            val unit4 = economic.getValue(Terrain.UNIT4).protection
+
+            // Если клетка принадлежит другому игроку
+            if (pole.mass[koorOnInt.x][koorOnInt.y].player != this) {
+                // Получаем защиту клетки
+                val cellProtection = pole.mass[koorOnInt.x][koorOnInt.y].protection
+
+                // Проверяем условия:
+                // 1. Если юнит НЕ является UNIT4
+                // 2. И защита юнита слабее или такая же как у защиты клетки
+                if (unitTypeInt != unit4 && cellProtection >= unitTypeInt) {
+                    println("11")
+                    return false
+                }
             }
 
             for (player in gameScene.listPlayers) {

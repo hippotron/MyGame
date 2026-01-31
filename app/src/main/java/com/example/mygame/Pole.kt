@@ -49,7 +49,7 @@ class Pole(
         context.resources.displayMetrics.heightPixels
     )
     val ogranichenie = limitation(
-            koorOnInt(0, (display.y*0.1).toInt()),
+            koorOnInt(0, (display.y*0.13).toInt()),
             koorOnInt((display.x*0.8).toInt(),(display.y-display.y*0.1).toInt()))
 
     // Делаем координаты наблюдаемыми состояниями
@@ -89,9 +89,6 @@ class Pole(
         }
     }
 
-    fun createMatrix(x: Int, y: Int, defaultValue: Int = 0): MutableList<MutableList<Int>> {
-        return MutableList(x) { MutableList(y) { defaultValue } }
-    }
     fun calculateHexagonWidth() {
         val screenX =ogranichenie.max.x - ogranichenie.min.x
         dx = screenX/mass.size
@@ -104,10 +101,12 @@ class Pole(
             }
         }
         minDx=dx
+
         ogranichenie.min.y=poleY
         ogranichenie.max.y=ogranichenie.min.y+(mass[0].size)*minDx+minDx/2
         ogranichenie.min.x=((display.x-screenX)/2)
-        ogranichenie.max.x=ogranichenie.min.x+screenX+2
+        ogranichenie.max.x=ogranichenie.min.x+screenX
+
         poleX=ogranichenie.min.x
         poleY=ogranichenie.min.y
     }
@@ -119,8 +118,11 @@ class Pole(
 
         //drawRectPole()// рисует поле из квадратов
         /*
-        rect(modifier = Modifier, ogranichenie.min.x, ogranichenie.min.y,
-            (ogranichenie.max.x - ogranichenie.min.x), (ogranichenie.max.y - ogranichenie.min.y), 5f, Color.Blue)
+        rect(modifier = Modifier,
+            ogranichenie.min.x.toFloat(),
+            ogranichenie.min.y.toFloat(),
+            ((ogranichenie.max.x - ogranichenie.min.x).toFloat()),
+            ((ogranichenie.max.y - ogranichenie.min.y).toFloat()), 5f, Color.Blue)
         */
     }
 

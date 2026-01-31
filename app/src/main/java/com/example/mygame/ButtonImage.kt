@@ -18,10 +18,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 class ButtonImage(
-    val x: Int,
-    val y: Int,
+    var x: Int,
+    var y: Int,
     val dx: Int,
-    val dy: Int,
+    var dy: Int,
     val name: Int,
     val name2: Int = name,
     var type: MutableState<Boolean> = mutableStateOf(false)  // Используем State
