@@ -54,7 +54,7 @@ class AuthorsScene(override var game: GameEngine,context: Context) : Scene {
                 if (event.pointerCount == 1) {
                     if (button_return.click(mx,my)==true){
                         //Log.d("","ttt")
-                        game.CurrentScene="Menu"
+                        game.goBackScene()
                     }
                 }
                 game.forceUpdate++

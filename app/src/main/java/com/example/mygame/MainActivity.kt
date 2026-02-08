@@ -15,7 +15,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 
 class MainActivity : ComponentActivity() {
     private var gameEngine: GameEngine = GameEngine()
-    val mapScene: MutableMap<String, Scene> = mutableMapOf()
+    val mapScene = mutableMapOf<String, Scene>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,10 +23,11 @@ class MainActivity : ComponentActivity() {
         // Фиксируем вертикальную ориентацию
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        mapScene.put("Menu", MenuScene(gameEngine, this))
-        mapScene.put("Game", GameScene(gameEngine, this))
-        mapScene.put("Setting", SettingScene(gameEngine, this))
-        mapScene.put("Authors", AuthorsScene(gameEngine, this))
+        mapScene["Menu"] = MenuScene(gameEngine, this)
+        mapScene["Game"] = GameScene(gameEngine, this)
+        mapScene["Setting"] = SettingScene(gameEngine, this)
+        mapScene["Rules"] = RulesScene(gameEngine, this)
+        mapScene["Authors"] = AuthorsScene(gameEngine, this)
 
         gameEngine.CurrentScene = "Menu"
 
@@ -40,12 +41,14 @@ class MainActivity : ComponentActivity() {
                 val previousScene = remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(currentScene) {
-                    // Вызываем onExit для предыдущей сцены
-                    mapScene[previousScene.value]?.onExit()
+                    if (!gameEngine.backScene) {
+                        // Вызываем onExit для предыдущей сцены
+                        mapScene[previousScene.value]?.onExit()
 
-                    // Вызываем onEnter для новой сцены
-                    scene?.onEnter()
-
+                        // Вызываем onEnter для новой сцены
+                        scene?.onEnter()
+                        println(gameEngine.backScene)
+                    }
                     previousScene.value = currentScene
                 }
 
@@ -67,7 +70,6 @@ class MainActivity : ComponentActivity() {
                 scene?.render()
             }
         }
-
     }
 
     override fun onResume() {

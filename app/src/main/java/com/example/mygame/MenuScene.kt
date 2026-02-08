@@ -18,17 +18,20 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
     //var mas=arrayOf(Color.Black,Color.Blue,Color.Red,Color.Yellow,Color.Green,Color.Gray,Color.Cyan)
 
     val displayMetrics = context.resources.displayMetrics
-    val screenXpx = displayMetrics.widthPixels
-    val screenYpx = displayMetrics.heightPixels
+    val screenX = displayMetrics.widthPixels
+    val screenY = displayMetrics.heightPixels
 
-    val button_game = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.38).toInt(),
-        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.game_two)
+    val button_new_game = ButtonImage((screenX*0.2).toInt(),(screenY*0.41).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.new_game)
 
-    val button_setting = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.5).toInt(),
-        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.setting_two)
+    val button_setting = ButtonImage((screenX*0.2).toInt(),(screenY*0.515).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.settings)
 
-    val button_authors = ButtonImage((screenXpx*0.2).toInt(),(screenYpx*0.623).toInt(),
-        (screenXpx*0.6).toInt(),(screenYpx*0.12).toInt(),R.drawable.authors_two)
+    val button_is_look_rupes = ButtonImage((screenX*0.2).toInt(),(screenY*0.62).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.is_look_rules)
+
+    val button_authors = ButtonImage((screenX*0.2).toInt(),(screenY*0.725).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.authors)
 
 
     override fun update() {
@@ -44,8 +47,9 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()
         )
-        button_game.Render()
+        button_new_game.Render()
         button_setting.Render()
+        button_is_look_rupes.Render()
         button_authors.Render()
     }
 
@@ -67,24 +71,27 @@ class MenuScene(override var game: GameEngine,context: Context): Scene{
                     Log.d("","$my")
                      */
 
-                    if (button_game.click(mx,my)==true){
+                    if (button_new_game.click(mx,my)==true){
                         //Log.d("","444")
-                        game.CurrentScene="Game"
+                        game.updateScene("Game")
 
                     }
 
                     if (button_setting.click(mx,my)==true){
-                        game.CurrentScene="Setting"
+                        game.updateScene("Setting")
+                    }
+
+                    if (button_is_look_rupes.click(mx,my)){
+                        game.updateScene("Rules")
                     }
 
                     if (button_authors.click(mx,my)==true){
-                        game.CurrentScene="Authors"
+                        game.updateScene("Authors")
                     }
 
 
                     game.forceUpdate++   // увеличиваем счётчик для принудительной перерисовки
                 }
-                true
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
                 if (event.pointerCount == 2) {

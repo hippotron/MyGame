@@ -26,7 +26,6 @@ import com.example.mygame.GlobalParam.RenderImage
 import kotlin.random.Random
 import com.example.mygame.GlobalParam.TextRender
 import com.example.mygame.ui.theme.Economic
-import java.nio.file.WatchEvent
 
 
 class GameScene(override var game: GameEngine, val context: Context) : Scene {
@@ -51,6 +50,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     var mini_fon_for_down_game = ButtonImage(-10,(screenY-screenY*0.1).toInt(),
         screenX+20,(screenY*0.1).toInt(),R.drawable.mini_fon)
 
+    var mini_fon_for_pause_menu = ButtonImage((screenX*0.13).toInt(),(screenY*0.37).toInt(),
+        (screenX*0.735).toInt(),(screenY*0.5).toInt(),R.drawable.mini_fon)
+
     val exit_win = ButtonImage((screenX*0.65).toInt(),(screenY*0.77).toInt(),
         (screenX*0.2).toInt(),(screenY*0.1).toInt(),R.drawable.image_return_mirror)
 
@@ -59,18 +61,32 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     val check_mark = ButtonImage(
         (pole.display.x*0.35).toInt(),
-        (pole.display.y*0.85).toInt(),
+        (pole.display.y*0.83).toInt(),
         (screenX*0.08).toInt(),
         (screenY*0.04).toInt(),
         R.drawable.check_mark)
 
     val cross = ButtonImage(
         (pole.display.x*0.65).toInt(),
-        (pole.display.y*0.85).toInt(),
+        (pole.display.y*0.83).toInt(),
         (screenX*0.08).toInt(),
         (screenY*0.04).toInt(),
         R.drawable.cross)
 
+    val button_return_in_game = ButtonImage((screenX*0.2).toInt(),(screenY*0.41).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.return_in_game)
+
+    val button_setting = ButtonImage((screenX*0.2).toInt(),(screenY*0.515).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.settings)
+
+    val button_is_look_rupes = ButtonImage((screenX*0.2).toInt(),(screenY*0.62).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.is_look_rules)
+
+    val button_return_in_menu = ButtonImage((screenX*0.2).toInt(),(screenY*0.725).toInt(),
+        (screenX*0.6).toInt(),(screenY*0.1).toInt(),R.drawable.return_in_menu)
+
+    val backGround_for_pause_menu = ButtonImage(0,0,
+        screenX,screenY,R.drawable.background_black)
 
     var hod_player by mutableStateOf(0)
 
@@ -88,6 +104,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     var delivereUnit by mutableStateOf(false)
     var delivereBuild by mutableStateOf(false)
     var delivereNextHod by mutableStateOf(false)
+
+    var isPauseMenu by  mutableStateOf(false)
 
     var selectAddUnit: Terrain = Terrain.NONE
     var selectAddBulid: Terrain = Terrain.NONE
@@ -111,7 +129,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     var unitButtonsMap = HashMap<Terrain, ButtonImage>()
     var buildButtonMap = HashMap<Terrain, ButtonImage>()
 
-    var nextHowTwo = 0
 
     init {
         createPLayers()
@@ -124,8 +141,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     // Переносим методы инициализации кнопок
     fun initButtonUnit() {
         val b1 = ButtonImage(
-            (pole.display.x * 0.15).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.x * 0.25).toInt(),
+            (pole.display.y * 0.77).toInt(),
             150,
             150,
             R.drawable.skeleton,
@@ -135,8 +152,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         unitButtonsMap[Terrain.UNIT1]=b1
 
         val b2 = ButtonImage(
-            (pole.display.x * 0.35).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.x * 0.42).toInt(),
+            (pole.display.y * 0.77).toInt(),
             150, 150,
             R.drawable.barbarian,
             name2 = R.drawable.dedicated_barbarin,
@@ -144,8 +161,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         )
         unitButtonsMap[Terrain.UNIT2]=b2
         val b3 = ButtonImage(
-            (pole.display.x * 0.55).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.x * 0.58).toInt(),
+            (pole.display.y * 0.77).toInt(),
             150, 150,
             R.drawable.knight,
             name2 = R.drawable.dedicated_knight,
@@ -154,7 +171,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         unitButtonsMap[Terrain.UNIT3]=b3
         val b4 = ButtonImage(
             (pole.display.x * 0.75).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.y * 0.77).toInt(),
             150, 150,
             R.drawable.hard_khight,
             name2 = R.drawable.dedicated_hard_knight,
@@ -166,7 +183,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     fun initButtonBuild() {
         val b1 = ButtonImage(
             (pole.display.x * 0.25).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.y * 0.76).toInt(),
             150, 150,
             R.drawable.farm,
             name2 = R.drawable.dedicated_farm,
@@ -175,7 +192,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         buildButtonMap[Terrain.FARM]=b1
         val b2 = ButtonImage(
             (pole.display.x * 0.45).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.y * 0.76).toInt(),
             150, 150,
             R.drawable.tower,
             name2 = R.drawable.dedicated_tower,
@@ -184,7 +201,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         buildButtonMap[Terrain.TOWER]=b2
         val b3 = ButtonImage(
             (pole.display.x * 0.65).toInt(),
-            (pole.display.y * 0.8).toInt(),
+            (pole.display.y * 0.76).toInt(),
             150, 150,
             R.drawable.tower_hard,
             name2 = R.drawable.dedicated_hard_tower,
@@ -236,16 +253,16 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         val farm = Economic(price = 200, protection = 0, income = 30, sale = 0, attack = 0)
         economic[Terrain.FARM]=farm
 
-        val tower = Economic(price = 120, protection = 2, income = 0, sale = 5, attack = 0)
+        val tower = Economic(price = 120, protection = 2, income = 0, sale = 50, attack = 0)
         economic[Terrain.TOWER]=tower
 
-        val hard_tower = Economic(price = 350, protection = 3, income = 0, sale = 20, attack = 0)
+        val hard_tower = Economic(price = 350, protection = 3, income = 0, sale = 200, attack = 0)
         economic[Terrain.HARD_TOWER]=hard_tower
 
-        val unit1 = Economic(price = 80, protection = 1, income = 0, sale = 2, attack = 1)
-        val unit2 = Economic(price = 220, protection = 2, income = 0, sale = 8, attack = 2)
-        val unit3 = Economic(price = 600, protection = 3, income = 0, sale = 30, attack = 3)
-        val unit4 = Economic(price = 1500, protection = 4, income = 0, sale = 80, attack = 4)
+        val unit1 = Economic(price = 80, protection = 1, income = 0, sale = 20, attack = 1)
+        val unit2 = Economic(price = 220, protection = 2, income = 0, sale = 80, attack = 2)
+        val unit3 = Economic(price = 600, protection = 3, income = 0, sale = 300, attack = 3)
+        val unit4 = Economic(price = 1500, protection = 4, income = 0, sale = 800, attack = 4)
 
         economic[Terrain.UNIT1] = unit1
         economic[Terrain.UNIT2] = unit2
@@ -267,11 +284,22 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             player.sale = 0
         }
 
-        for (player in listPlayers){
-            val (x,y)=randomXY()
+        for (player in listPlayers.indices){
+            //val (x,y)=randomXY()
 
-            pole.mass[x][y].player=player
-            cellPlayerInit(x,y,player)
+            if (player==0){
+                pole.mass[pole.mass.size-2][1].player=listPlayers[player]
+                cellPlayerInit(pole.mass.size-2,1,listPlayers[player])
+            } else if (player==1){
+                pole.mass[1][pole.mass[0].size-2].player=listPlayers[player]
+                cellPlayerInit(1,pole.mass[0].size-2,listPlayers[player])
+            } else if (player==2){
+                pole.mass[1][1].player=listPlayers[player]
+                cellPlayerInit(1,1,listPlayers[player])
+            }
+
+            //pole.mass[x][y].player=player
+            //cellPlayerInit(x,y,player)
 
             /*
             pole.mass[1][1].player=player
@@ -289,9 +317,10 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     }
 
     fun addPlayers() {
-        player1 = Player("Первый", pole, 1, economic, image_mass, this, context)
-        player2 = Player("Второй", pole, 3, economic, image_mass, this, context)
-        listPlayers = arrayListOf(player1, player2)
+        val player1 = Player("Первый", pole, 1, economic, image_mass, this, context)
+        val player2 = Player("Второй", pole, 3, economic, image_mass, this, context)
+        val player3 = Player("Третий", pole, 4, economic, image_mass, this, context)
+        listPlayers = arrayListOf(player1, player2,player3)
     }
 
     fun randomXY(): Pair<Int, Int> {
@@ -414,9 +443,10 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     override fun onTouchEvent(event: MotionEvent) {
         val listPLayersHadCells = getListPlayersHadCells()
 
-        listPlayers[hod_player].onTouch(event)
-        updateProtectionPole()
-
+        if (!isPauseMenu) {
+            listPlayers[hod_player].onTouch(event)
+            updateProtectionPole()
+        }
         // Добавляем обработку нажатий на кнопки в GameScene
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> { }
@@ -426,128 +456,153 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                     val mx = event.x.toInt()
                     val my = event.y.toInt()
 
-                    // Сбрасываем выделение всех кнопок
-                    for (i in unitButtonsMap) {
-                        i.value.type.value = false
-                    }
-                    for (i in buildButtonMap) {
-                        i.value.type.value = false
-                    }
+                    if (!isPauseMenu) {
 
-                    // Обработка кнопки buildings
-                    if (!delivereNextHod && buildSettings.click(mx, my)) {
-                        /*
-                        var kolvoFarms = 0
-                        for (i in listPlayers[hod_player].buildings) {
-                            if (i.type == Terrain.FARM) {
-                                kolvoFarms++
+                        // Сбрасываем выделение всех кнопок
+                        for (i in unitButtonsMap) {
+                            i.value.type.value = false
+                        }
+                        for (i in buildButtonMap) {
+                            i.value.type.value = false
+                        }
+
+                        // Обработка кнопки buildings
+                        if (!delivereNextHod && buildSettings.click(mx, my)) {
+
+                            update_price_farm()
+
+                            delivereBuild = !delivereBuild
+                            if (delivereBuild) {
+                                selectAddBulid = Terrain.NONE
+                                //val a = buildButtonMap.getValue(selectAddBulid)
+                                //a.type.value = true
                             }
-                        }
-                        val priceFarms = 120 + kolvoFarms * 20
-                        val farm = Economic(
-                            price = priceFarms,
-                            protection = 0,
-                            income = 50,
-                            sale = 0,
-                            attack = 0
-                        )
-                        economic[Terrain.FARM] = farm
-                        */
-                        delivereBuild = !delivereBuild
-                        if (delivereBuild) {
-                            selectAddBulid = Terrain.NONE
-                            //val a = buildButtonMap.getValue(selectAddBulid)
-                            //a.type.value = true
-                        }
-                        delivereUnit = false
-                    }
-
-                    // Обработка кнопки units
-                    if (!delivereNextHod && unitSettings.click(mx, my)) {
-                        delivereUnit = !delivereUnit
-                        if (delivereUnit) {
-                            selectAddUnit = Terrain.NONE
-                            //val a = unitButtonsMap.getValue(selectAddUnit)
-                            //a.type.value = true
-                        }
-                        delivereBuild = false
-                    }
-
-                    if (delivereNextHod){
-                        if (check_mark.click(mx,my)){
-                            nextHodPlayer()
-                        }
-                        if (cross.click(mx,my)){
-                            delivereNextHod = false
                             delivereUnit = false
+                        }
+
+                        // Обработка кнопки units
+                        if (!delivereNextHod && unitSettings.click(mx, my)) {
+                            delivereUnit = !delivereUnit
+                            if (delivereUnit) {
+                                selectAddUnit = Terrain.NONE
+                                //val a = unitButtonsMap.getValue(selectAddUnit)
+                                //a.type.value = true
+                            }
                             delivereBuild = false
                         }
-                    }
 
-                    // Обработка выбора конкретного юнита/здания
-                    if (delivereUnit) {
-                        for (i in unitButtonsMap) {
-                            if (i.value.click(mx, my)) {
-                                selectAddUnit = i.key
-                                i.value.type.value = true
-                                break
+                        if (delivereNextHod) {
+                            if (check_mark.click(mx, my)) {
+                                nextHodPlayer()
+                            }
+                            if (cross.click(mx, my)) {
+                                delivereNextHod = false
+                                delivereUnit = false
+                                delivereBuild = false
                             }
                         }
-                    }
 
-                    if (delivereBuild) {
-                        for (i in buildButtonMap) {
-                            if (i.value.click(mx, my)) {
-                                selectAddBulid = i.key
-                                i.value.type.value = true
-                                break
+                        // Обработка выбора конкретного юнита/здания
+                        if (delivereUnit) {
+                            for (i in unitButtonsMap) {
+                                if (i.value.click(mx, my)) {
+                                    selectAddUnit = i.key
+                                    i.value.type.value = true
+                                    break
+                                }
                             }
                         }
-                    }
 
-                    if (listPLayersHadCells.size != 1) {
-                        if (button_point_back.click(mx, my)) {
-                            pole = Pole(context = contexts)
-                            createPLayers()
-                            game.CurrentScene = "Menu"
+                        if (delivereBuild) {
+                            for (i in buildButtonMap) {
+                                if (i.value.click(mx, my)) {
+                                    selectAddBulid = i.key
+                                    i.value.type.value = true
+                                    break
+                                }
+                            }
                         }
-                        if (button_next_hod.click(mx, my)) {
-                            delivereNextHod = true
-                            nextHowTwo++
-                            //println(delivereNextHod)
-                            //nextHodPlayer()
-                            forceRender()
-                        }
-                        if (nextHowTwo==2){
-                            nextHodPlayer()
-                        }
-                    } else {
-                        if (exit_win.click(mx, my)) {
-                            pole = Pole(context = contexts)
-                            createPLayers()
-                            game.CurrentScene = "Menu"
-                        }
-                    }
 
-                    if (delivereBuild || delivereUnit || delivereNextHod){
-                        //println("$delivereBuild $delivereUnit $delivereNextHod")
-                        mini_fon_for_down_game.y=(screenY-screenY*0.2).toInt()
-                        mini_fon_for_down_game.dy=(screenY*0.2).toInt()
-                        pole.ogranichenie.max.y=(screenY-screenY*0.2).toInt()
+                        if (listPLayersHadCells.size != 1) {
+                            if (button_point_back.click(mx, my)) {
+                                //pole = Pole(context = contexts)
+                                //createPLayers()
+                                isPauseMenu = true
+                                //game.CurrentScene = "Menu"
+                            }
+                            if (button_next_hod.click(mx, my)) {
+                                delivereNextHod = true
+                                //nextHowTwo++
+                                //println(delivereNextHod)
+                                //nextHodPlayer()
+                                forceRender()
+                            }
+
+                        } else {
+                            if (exit_win.click(mx, my)) {
+                                pole = Pole(context = contexts)
+                                createPLayers()
+                                game.CurrentScene = "Menu"
+                            }
+                        }
+
+                        if (delivereBuild || delivereUnit || delivereNextHod) {
+                            //println("$delivereBuild $delivereUnit $delivereNextHod")
+                            mini_fon_for_down_game.y = (screenY - screenY * 0.25).toInt()
+                            mini_fon_for_down_game.dy = (screenY * 0.25).toInt()
+                            pole.ogranichenie.max.y = (screenY - screenY * 0.25).toInt()
+                        } else {
+                            mini_fon_for_down_game.y = (screenY - screenY * 0.1).toInt()
+                            mini_fon_for_down_game.dy = (screenY * 0.1).toInt()
+                            pole.ogranichenie.max.y =
+                                pole.ogranichenie.min.y + (pole.mass[0].size) * pole.minDx + pole.minDx / 2
+                        }
                     }
                     else {
-                        mini_fon_for_down_game.y=(screenY-screenY*0.1).toInt()
-                        mini_fon_for_down_game.dy=(screenY*0.1).toInt()
-                        pole.ogranichenie.max.y=pole.ogranichenie.min.y+(pole.mass[0].size)*pole.minDx+pole.minDx/2
-                    }
+                        // Меню паузы
+                        if (button_return_in_game.click(mx,my)){
+                            isPauseMenu = false
+                            // УБЕРИТЕ ВЫЗОВ createPLayers() ОТСЮДА
+                            return
+                        }
+                        if (button_setting.click(mx,my)){
+                            game.updateScene("Setting")
+                            return
+                        }
+                        if (button_is_look_rupes.click(mx,my)){
+                            game.updateScene("Rules")
+                        }
 
+                        if (button_return_in_menu.click(mx,my)){
+                            game.updateScene("Menu")
+                            return
+                        }
+                    }
                 }
             }
         }
 
         pole.onTouch(event)
-
         game.forceUpdate++
+
+    }
+
+    fun update_price_farm(){
+        var kolvoFarms = 0
+        for (i in listPlayers[hod_player].buildings) {
+            if (i.type == Terrain.FARM) {
+                kolvoFarms++
+            }
+        }
+        val priceFarms = economic[Terrain.FARM]!!.price + kolvoFarms * 20
+        val farm = Economic(
+            price = priceFarms,
+            protection = 0,
+            income = 50,
+            sale = 0,
+            attack = 0
+        )
+        economic[Terrain.FARM] = farm
     }
 
     @Composable
@@ -557,7 +612,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         val textMeasurer = rememberTextMeasurer()
 
         val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
-
+        // win
         if (listPLayersHadCells.size==1){
             Image(
                 painter = painterResource(id = R.drawable.background_win),// Укажите ваш файл
@@ -612,8 +667,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             }
         }
         else {
+
             Image(
-                painter = painterResource(id = R.drawable.background_menu),
+                painter = painterResource(id = R.drawable.ocean),
                 contentDescription = "фон",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()
@@ -626,8 +682,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                     RenderConstructionCells(transparentHexagonBitmap)
                 }
             }
-            mini_fon_for_up_game.Render()
-            leo_koin.Render()
 
             // Отображаем текущего игрока
             for (i in listPlayers.indices) {
@@ -637,6 +691,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                 }
                 listPlayers[i].Render(renderPlayerIndicator)
             }
+
+            mini_fon_for_up_game.Render()
+            leo_koin.Render()
 
             Canvas(modifier = Modifier.fillMaxSize()) {
                 TextRender(
@@ -659,12 +716,12 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                 )
 
                 var textIncome = "+"
-                if (listPlayers[hod_player].income - listPlayers[hod_player].sale<0){
-                    textIncome=""
+                if (listPlayers[hod_player].income - listPlayers[hod_player].sale < 0) {
+                    textIncome = ""
                 }
                 TextRender(
                     textMeasurer,
-                    name = "$textIncome${ listPlayers[hod_player].income - listPlayers[hod_player].sale}",
+                    name = "$textIncome${listPlayers[hod_player].income - listPlayers[hod_player].sale}",
                     x = (screenX * 0.8).toInt(),
                     y = (screenY * 0.06).toInt(),
                     size = 25,
@@ -684,7 +741,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                         textMeasurer,
                         name = "Вы хотите закончить ход?",
                         x = (screenX * 0.5).toInt(),
-                        y = (screenY * 0.81).toInt(),
+                        y = (screenY * 0.79).toInt(),
                         size = 25,
                         center = true
                     )
@@ -692,32 +749,91 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             }
 
             if (delivereUnit && !delivereNextHod) {
+
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    TextRender(
+                        textMeasurer,
+                        name = "Цена",
+                        x = (screenX*0.15).toInt(),
+                        y = (screenY*0.83).toInt(),
+                        size = 25,
+                        center=true
+                    )
+
+                    TextRender(
+                        textMeasurer,
+                        name = "Доход",
+                        x = (screenX*0.15).toInt(),
+                        y = (screenY*0.86).toInt(),
+                        size = 25,
+                        center=true
+                    )
+                }
+
                 for (i in unitButtonsMap) {
                     i.value.Render()
-                    val price = economic.getValue(i.key)
+                    val economicBuild = economic.getValue(i.key)
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         TextRender(
                             textMeasurer,
-                            name = "${price.price}",
+                            name = "${economicBuild.price}",
                             x = i.value.x + i.value.dx / 2,
                             y = (i.value.y + i.value.dx).toInt(),
                             size = 25,
                             center = true
                         )
+
+                        TextRender(
+                            textMeasurer,
+                            name = "${(economicBuild.income-economicBuild.sale)}",
+                            x = i.value.x + i.value.dx / 2,
+                            y = (screenY*0.86).toInt(),
+                            size = 25,
+                            center = true
+                        )
+
                     }
                 }
             }
 
             if (delivereBuild && !delivereNextHod) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    TextRender(
+                        textMeasurer,
+                        name = "Цена",
+                        x = (screenX*0.15).toInt(),
+                        y = (screenY*0.83).toInt(),
+                        size = 25,
+                        center=true
+                    )
+
+                    TextRender(
+                        textMeasurer,
+                        name = "Доход",
+                        x = (screenX*0.15).toInt(),
+                        y = (screenY*0.86).toInt(),
+                        size = 25,
+                        center=true
+                    )
+                }
                 for (i in buildButtonMap) {
                     i.value.Render()
-                    val price = economic.getValue(i.key)
+                    val economicBuild = economic.getValue(i.key)
                     Canvas(modifier = Modifier.fillMaxSize()) {
                         TextRender(
                             textMeasurer,
-                            name = "${price.price}",
+                            name = "${economicBuild.price}",
                             x = i.value.x + i.value.dx / 2,
                             y = (i.value.y + i.value.dx).toInt(),
+                            size = 25,
+                            center = true
+                        )
+
+                        TextRender(
+                            textMeasurer,
+                            name = "${(economicBuild.income-economicBuild.sale)}",
+                            x = i.value.x + i.value.dx / 2,
+                            y = (screenY*0.86).toInt(),
                             size = 25,
                             center = true
                         )
@@ -728,7 +844,19 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             // Отображаем кнопки выбора зданий и юнитов
             buildSettings.Render()
             unitSettings.Render()
+
         }
+
+        if (isPauseMenu){
+            backGround_for_pause_menu.Render(alpha = 0.7f)
+            mini_fon_for_pause_menu.Render(alpha = 1f)
+
+            button_return_in_game.Render()
+            button_setting.Render()
+            button_is_look_rupes.Render()
+            button_return_in_menu.Render()
+        }
+
     }
 
     fun DrawScope.RenderConstructionCells(possibleBitmap: ImageBitmap){
@@ -771,8 +899,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
         listPlayers[hod_player].selectedUnit=null
 
-        nextHowTwo=0
-
         mini_fon_for_down_game.y=(screenY-screenY*0.1).toInt()
         mini_fon_for_down_game.dy=(screenY*0.1).toInt()
         pole.ogranichenie.max.y=pole.ogranichenie.min.y+(pole.mass[0].size)*pole.minDx+pole.minDx/2
@@ -805,10 +931,27 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             listPlayers[hod_player].getSale()
             listPlayers[hod_player].getKazna()
         }
-
     }
 
     override fun onEnter() {
+        isPauseMenu = false
+        hod_player = 0
+
+        // Сбрасываем состояния выбора
+        delivereBuild = false
+        delivereUnit = false
+        selectAddUnit = Terrain.NONE
+        selectAddBulid = Terrain.NONE
+
+        // Сбрасываем настройки игроков и поля
+        pole = Pole(context = contexts)
+        createPLayers()
+
+        for (player in listPlayers){
+            player.kazna=30
+            player.income=0
+            player.sale=0
+        }
         // Обновляем экономику
         listPlayers[hod_player].getKazna()
 
@@ -816,25 +959,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     }
 
     override fun onExit() {
-        hod_player = 0
-        // Сбрасываем состояния выбора
-        delivereBuild = false
-        delivereUnit = false
-        selectAddUnit = Terrain.NONE
-        selectAddBulid = Terrain.NONE
 
-        for (player in listPlayers){
-            player.kazna=30
-            player.income=0
-            player.sale=0
-
-            delivereBuild = false
-            delivereUnit = false
-        }
-
-        // Сбрасываем движение юнитов
-        for (unit in listPlayers[hod_player].units) {
-            unit.Movement = 2
-        }
     }
 }

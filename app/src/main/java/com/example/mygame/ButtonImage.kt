@@ -27,7 +27,7 @@ class ButtonImage(
     var type: MutableState<Boolean> = mutableStateOf(false)  // Используем State
 ) {
     @Composable
-    fun Render() {
+    fun Render(alpha: Float=1f) {
         // эта строка получает доступ к контексту, он необходим для доступа к картинкам
         // val context = LocalContext.current
 
@@ -45,7 +45,9 @@ class ButtonImage(
             drawImage(
                 image = image,
                 dstOffset = IntOffset(x, y),
-                dstSize = IntSize(dx, dy)
+                dstSize = IntSize(dx, dy),
+                alpha = alpha,
+
             )
         }
     }

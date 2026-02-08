@@ -54,6 +54,7 @@ class Player(
         getSale()
 
         kazna=kazna+income-sale
+        if (kazna<0) kazna=0
     }
 
     fun getSale(){
