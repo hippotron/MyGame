@@ -1,4 +1,4 @@
-package com.example.mygame
+package com.example.mygame.PackageForKoor
 
 class koorOnInt (x2: Int, y2: Int){
     var x: Int = x2

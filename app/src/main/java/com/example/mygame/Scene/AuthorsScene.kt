@@ -1,23 +1,33 @@
-package com.example.mygame
+package com.example.mygame.Scene
 
 import android.content.Context
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.mygame.ButtonImage
+import com.example.mygame.Scene.ForScene.GameEngine
+import com.example.mygame.R
+import com.example.mygame.Scene.ForScene.Scene
 
-class SettingScene(override var game: GameEngine,context: Context) : Scene {
+class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
+    override fun update() {
 
+    }
     val displayMetrics = context.resources.displayMetrics
-    val screenXpx = displayMetrics.widthPixels.toFloat()
-    val screenYpx = displayMetrics.heightPixels.toFloat()
+    val screenXpx = displayMetrics.widthPixels
+    val screenYpx = displayMetrics.heightPixels
 
-    val button_return = ButtonImage((screenXpx*0.1).toInt(),(screenYpx*0.07).toInt(),
-        (screenXpx*0.3).toInt(),(screenYpx*0.1).toInt(),R.drawable.image_return)
+    val button_return = ButtonImage(
+        (screenXpx * 0.1).toInt(), (screenYpx * 0.07).toInt(),
+        (screenXpx * 0.3).toInt(), (screenYpx * 0.1).toInt(), R.drawable.image_return
+    )
 
     @Composable
     override fun render() {
@@ -27,6 +37,11 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
             contentDescription = "фон", // Описание для доступности (обязательно!)
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()
+        )
+
+        Text(
+            modifier = Modifier.offset(150.dp,150.dp),
+            text = "Авторы"
         )
 
         button_return.Render()
@@ -52,10 +67,6 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
         }
     }
 
-    override fun update() {
-
-    }
-
     override fun onEnter() {
 
     }
@@ -63,5 +74,4 @@ class SettingScene(override var game: GameEngine,context: Context) : Scene {
     override fun onExit() {
 
     }
-
 }

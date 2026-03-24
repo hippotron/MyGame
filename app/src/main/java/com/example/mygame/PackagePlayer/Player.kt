@@ -1,4 +1,4 @@
-package com.example.mygame
+package com.example.mygame.PackagePlayer
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -13,19 +13,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import androidx.compose.ui.res.imageResource
+import com.example.mygame.PackagePlayer.OtherForPlayer.Build
+import com.example.mygame.Economic
 import com.example.mygame.GlobalParam.GlobalDxKoef
 import com.example.mygame.GlobalParam.RenderImage
-import com.example.mygame.ui.theme.Economic
+import com.example.mygame.PackageForKoor.koorOnInt
+import com.example.mygame.Pole.Pole
+import com.example.mygame.R
+import com.example.mygame.Scene.GameScene
+import com.example.mygame.Terrain
+import com.example.mygame.PackagePlayer.OtherForPlayer.Unit
 
 class Player(
     val name: String,
-    val pole: Pole,
+    var pole: Pole,
     var color: Int,
     val economic: HashMap<Terrain, Economic>,
     val image_mass: HashMap<Terrain, ImageBitmap>,
@@ -35,8 +38,8 @@ class Player(
 
 
     // Используем mutableStateListOf для автоматического обновления
-    val units = mutableStateListOf<Unit>()
-    val buildings = mutableStateListOf<Build>()
+    var units = mutableStateListOf<Unit>()
+    var buildings = mutableStateListOf<Build>()
     var selectedUnit by mutableStateOf<Int?>(null)
     var touchRender by mutableStateOf(0)
 
@@ -184,9 +187,9 @@ class Player(
     fun Render(renderPlayerIndicator: Boolean)
     {
         val updateRender = touchRender
-        val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
+        val transparentHexagonBitmap = ImageBitmap.Companion.imageResource(id = R.drawable.transparent_hexagon)
 
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.Companion.fillMaxSize()) {
             RenderUnits(renderPlayerIndicator)
             RenderFarms()
             RenderPossibleMoves(transparentHexagonBitmap)
@@ -370,7 +373,7 @@ class Player(
     {
 
         val bulidType = economic.getValue(type)
-        if (kazna - bulidType.price >= 0 && isValidMove(koorOnInt(x,y))) {
+        if (kazna - bulidType.price >= 0 && isValidMove(koorOnInt(x, y))) {
             buildings.add(Build(koorOnInt(x, y), type))
             kazna -= bulidType.price
             gameScene.delivereBuild=false
@@ -389,16 +392,16 @@ class Player(
         val verifiedMoves = mutableListOf<koorOnInt>() // verified - проверенные
         val move =  mutableListOf<koorOnInt>()
 
-        move.add(koorOnInt(X-1, Y))
-        move.add(koorOnInt(X, Y-1))
-        move.add(koorOnInt(X+1, Y))
-        move.add(koorOnInt(X, Y+1))
+        move.add(koorOnInt(X - 1, Y))
+        move.add(koorOnInt(X, Y - 1))
+        move.add(koorOnInt(X + 1, Y))
+        move.add(koorOnInt(X, Y + 1))
         if (X % 2 == 0) {
-            move.add(koorOnInt(X-1, Y-1))
-            move.add(koorOnInt(X+1, Y-1))
+            move.add(koorOnInt(X - 1, Y - 1))
+            move.add(koorOnInt(X + 1, Y - 1))
         } else{
-            move.add(koorOnInt(X-1, Y+1))
-            move.add(koorOnInt(X+1, Y+1))
+            move.add(koorOnInt(X - 1, Y + 1))
+            move.add(koorOnInt(X + 1, Y + 1))
         }
 
         for (i in move){
@@ -537,4 +540,3 @@ class Player(
         return Pair(massX, massY)
     }
 }
-

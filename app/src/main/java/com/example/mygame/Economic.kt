@@ -1,4 +1,4 @@
-package com.example.mygame.ui.theme
+package com.example.mygame
 
 class Economic (
     val price: Int,

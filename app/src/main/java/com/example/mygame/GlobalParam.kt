@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
-import com.example.mygame.Pole
+import com.example.mygame.Pole.Pole
 
 val GlobalDxKoef = 0.74
 
@@ -24,9 +24,10 @@ fun DrawScope.TextRender(
     name: String,
     x: Int,
     y: Int,
-    size: Int,
+    size: Int = 25,
     bold: Boolean = false,
-    center: Boolean = false)
+    center: Boolean = false,
+    color: Color = Color.Black)
 {
     var textWidth = 0
     //var textHeight = 0
@@ -49,7 +50,7 @@ fun DrawScope.TextRender(
         textMeasurer = textMeasurer,
         text = name,
         style = TextStyle(
-            color = Color.Black,
+            color = color,
             fontSize = size.sp,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal
         ),

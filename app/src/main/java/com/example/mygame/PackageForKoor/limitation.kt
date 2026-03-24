@@ -1,4 +1,4 @@
-package com.example.mygame
+package com.example.mygame.PackageForKoor
 
 class limitation(min1: koorOnInt , max1: koorOnInt) {
     var min: koorOnInt = min1

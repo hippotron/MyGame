@@ -1,18 +1,12 @@
 package com.example.mygame
 
-
-import android.graphics.BitmapFactory
-import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -32,13 +26,13 @@ class ButtonImage(
         // val context = LocalContext.current
 
         val image = if (type.value == false)
-            ImageBitmap.imageResource(id = name)
+            ImageBitmap.Companion.imageResource(id = name)
         else
-            ImageBitmap.imageResource(id = name2)
+            ImageBitmap.Companion.imageResource(id = name2)
 
         // Canvas создает холст(область для рисования) на весь экран
         Canvas(
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .fillMaxSize()
         ) {
 
@@ -48,7 +42,7 @@ class ButtonImage(
                 dstSize = IntSize(dx, dy),
                 alpha = alpha,
 
-            )
+                )
         }
     }
 

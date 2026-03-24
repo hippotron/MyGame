@@ -1,12 +1,7 @@
-package com.example.mygame
+package com.example.mygame.Scene.ForScene
 
-import android.content.Context
 import android.view.MotionEvent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Canvas
-
-
 
 interface Scene {
 

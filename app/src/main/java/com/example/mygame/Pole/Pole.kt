@@ -1,10 +1,9 @@
-package com.example.mygame
+package com.example.mygame.Pole
 
 // Добавьте эти импорты:
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,11 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import kotlin.math.sqrt
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.mygame.GlobalParam.GlobalDxKoef
+import com.example.mygame.R
+import com.example.mygame.Terrain
+import com.example.mygame.PackageForKoor.koorOnInt
+import com.example.mygame.PackageForKoor.limitation
 
 
 class Pole(
@@ -49,8 +50,9 @@ class Pole(
         context.resources.displayMetrics.heightPixels
     )
     val ogranichenie = limitation(
-            koorOnInt(0, (display.y*0.13).toInt()),
-            koorOnInt((display.x*0.8).toInt(),(display.y-display.y*0.1).toInt()))
+        koorOnInt(0, (display.y * 0.13).toInt()),
+        koorOnInt((display.x * 0.8).toInt(), (display.y - display.y * 0.1).toInt())
+    )
 
     // Делаем координаты наблюдаемыми состояниями
     var poleX by mutableStateOf(0)

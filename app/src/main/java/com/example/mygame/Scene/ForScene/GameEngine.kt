@@ -1,4 +1,4 @@
-package com.example.mygame
+package com.example.mygame.Scene.ForScene
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

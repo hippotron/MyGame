@@ -12,6 +12,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.mygame.Scene.AuthorsScene
+import com.example.mygame.Scene.ForScene.GameEngine
+import com.example.mygame.Scene.GameScene
+import com.example.mygame.Scene.MenuScene
+import com.example.mygame.Scene.RulesScene
+import com.example.mygame.Scene.ForScene.Scene
+import com.example.mygame.Scene.SettingScene
+import com.example.mygame.data.profile_data
+import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     private var gameEngine: GameEngine = GameEngine()
@@ -24,12 +33,24 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         mapScene["Menu"] = MenuScene(gameEngine, this)
-        mapScene["Game"] = GameScene(gameEngine, this)
+        val gameScene = GameScene(gameEngine, this)
+        mapScene["Game"] = gameScene
+
         mapScene["Setting"] = SettingScene(gameEngine, this)
-        mapScene["Rules"] = RulesScene(gameEngine, this)
+        mapScene["Rules"] = RulesScene(gameEngine, this,gameScene.economic)
         mapScene["Authors"] = AuthorsScene(gameEngine, this)
 
         gameEngine.CurrentScene = "Menu"
+
+        // ЗАГРУЗКА ПРОФИЛЯ - ИСПРАВЛЕНО
+        val gameStorage = GameStorage(this)
+        val loadSuccess = gameStorage.loadFromJsonProfile()
+
+        if (!loadSuccess) {
+            // Если файла нет или ошибка загрузки, создаем профиль по умолчанию
+            profile_data.DEFAULT_PROFILE = profile_data("player", UUID.randomUUID())
+            gameStorage.saveToJsonProfile()
+        }
 
         // Можно вызывать любые @Composable функции
         setContent {
@@ -37,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val forceUpdate = gameEngine.forceUpdate
 
             Box(modifier = Modifier.fillMaxSize()) {
+                gameEngine.forceUpdate
                 val scene = mapScene[currentScene]
                 val previousScene = remember { mutableStateOf<String?>(null) }
 
