@@ -4,10 +4,12 @@ package com.example.mygame.Pole
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import kotlin.math.sqrt
 import androidx.compose.ui.unit.IntOffset
@@ -70,7 +74,6 @@ class Pole(
     private var touchState by mutableStateOf(TouchState())
 
     init {
-        // Функция, вызываемая в конструкторе
         initializePole()
     }
 
@@ -117,8 +120,19 @@ class Pole(
     fun Render() {
         //Log.d("pole","$dx")
         drawHexagonPole() // рисует поле из шестиугольников
+        /*
+        LaunchedEffect(mass) {
+            Log.d("PoleRender", "=== Mass content ===")
+            for (i in mass.indices) {
+                for (j in mass[i].indices) {
+                    val cell = mass[i][j]
+                    Log.d("PoleRender", "mass[$i][$j]: player=${cell.player?.color}, protection=${cell.protection}, land=${cell.land}")
+                }
+            }
+        }*/
 
         //drawRectPole()// рисует поле из квадратов
+
         /*
         rect(modifier = Modifier,
             ogranichenie.min.x.toFloat(),
@@ -307,6 +321,7 @@ class Pole(
     fun distanceBetweenPoints(x1: Int, y1: Int, x2: Int, y2: Int): Int {
         val deltaX = x2 - x1
         val deltaY = y2 - y1
+
         return sqrt((deltaX * deltaX + deltaY * deltaY).toDouble()).toInt()
     }
 
@@ -326,7 +341,7 @@ class Pole(
                         if (i % 2 != 0) {
                             l = (dx/2)
                         }
-                        val posX= (poleX + i * (dx * GlobalDxKoef)).toInt() // переделать на 0,73
+                        val posX= (poleX + i * (dx * GlobalDxKoef)).toInt()
                         val posY= (poleY + j * (dx) + l).toInt()
 
                         if (posX + dx > 0 && posX < display.x &&
@@ -345,7 +360,9 @@ class Pole(
                                     dstSize = IntSize(dx.toInt(), dx.toInt())
                                 )
                             }
+
                             /*
+                            // отображение защиты клеток
                             drawIntoCanvas { canvas ->
                                 val textPaint = android.graphics.Paint().apply {
                                     color = android.graphics.Color.BLUE

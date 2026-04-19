@@ -7,15 +7,14 @@ interface Scene {
 
     var game : GameEngine
     //var renderState: MutableState<Int>
-    // Вызывается для обновления логики (движение, физика, AI)
+    // Вызывается для обновления логики
     fun update()
 
-    // Вызывается для отрисовки кадра
+    // Вызывается для отрисовки крафики
     @Composable
     fun render()
 
     // Обработка касаний
-
     fun onTouchEvent(event: MotionEvent)
 
     // Вызывается при переходе на эту сцену (инициализация)

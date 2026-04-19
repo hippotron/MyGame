@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         mapScene["Menu"] = MenuScene(gameEngine, this)
+
         val gameScene = GameScene(gameEngine, this)
         mapScene["Game"] = gameScene
 
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
         gameEngine.CurrentScene = "Menu"
 
-        // ЗАГРУЗКА ПРОФИЛЯ - ИСПРАВЛЕНО
+
         val gameStorage = GameStorage(this)
         val loadSuccess = gameStorage.loadFromJsonProfile()
 
@@ -57,11 +58,13 @@ class MainActivity : ComponentActivity() {
             val currentScene = gameEngine.CurrentScene
             val forceUpdate = gameEngine.forceUpdate
 
+            // позваляет рисовать картинки друг на друге, т е изменять их размеры и тд
             Box(modifier = Modifier.fillMaxSize()) {
                 gameEngine.forceUpdate
                 val scene = mapScene[currentScene]
                 val previousScene = remember { mutableStateOf<String?>(null) }
 
+                // запускает код когда меняется currentScene
                 LaunchedEffect(currentScene) {
                     if (!gameEngine.backScene) {
                         // Вызываем onExit для предыдущей сцены
@@ -79,11 +82,16 @@ class MainActivity : ComponentActivity() {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { context ->
+                        // создаем view который будет получать нажатия по экрану
                         View(context)
                     },
+
                     update = { view ->
+                        // создаем event, это обьект с координатами и типом касания(MOVE, DOWN, UP)
                         view.setOnTouchListener { _, event ->
+                            // используем event в функции
                             scene?.onTouchEvent(event)
+                            // true означает конкц события
                             true
                         }
                     }
@@ -102,22 +110,20 @@ class MainActivity : ComponentActivity() {
         super.onPause()
     }
 
-    // В Activity
+    // делает фулл экран
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemUI()
+    }
+
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                         or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_FULLSCREEN
-                        // Добавьте эти флаги для Android 10+
                         or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
-    }
-
-    // В onWindowFocusChanged
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemUI()
     }
 }

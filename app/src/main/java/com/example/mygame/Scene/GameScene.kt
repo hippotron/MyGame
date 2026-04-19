@@ -46,7 +46,6 @@ import java.io.File
 import kotlin.collections.iterator
 
 class GameScene(override var game: GameEngine, val context: Context) : Scene {
-    //val context = context
     val displayMetrics = context.resources.displayMetrics
     val screenX = displayMetrics.widthPixels
     val screenY = displayMetrics.heightPixels
@@ -406,7 +405,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     fun addPlayers() {
         val player1 = Player(profile_data.DEFAULT_PROFILE.playerName, pole, 1, economic, image_mass, this, context)
-        val player2 = Player("Второй", pole, 3, economic, image_mass, this, context)
+        val player2 = Player("2_player", pole, 3, economic, image_mass, this, context)
         //val player3 = Player("Третий", pole, 4, economic, image_mass, this, context)
         listPlayers = arrayListOf(player1, player2)
     }
@@ -567,7 +566,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             val gameStorage = GameStorage(context)
             val name_json = "game_map1.json"
             gameStorage.saveToJsonGameMap(name_json, gameMap)
-            // Узнать полный путь к файлу
+
+            // путь к файлу
             val filePath = File(context.filesDir, name_json).absolutePath
             println("Карта сохранена в: $filePath")
             isSaved=true
@@ -1016,7 +1016,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                             size = 25,
                             center = true
                         )
-
                     }
                 }
             }
@@ -1131,7 +1130,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                 kolvoFarms++
             }
         }
-        val priceFarms = economic[Terrain.immutableFARM]!!.price + kolvoFarms * 20
+        val basePrice = economic[Terrain.immutableFARM]?.price ?: 200
+        val priceFarms = basePrice + kolvoFarms * 20
         val farm = Economic(
             price = priceFarms,
             protection = 0,
@@ -1161,7 +1161,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     }
 
     fun nextHodPlayer() {
-        // Сбрасываем состояния выбора при смене хода
         delivereBuild = false
         delivereUnit = false
         delivereNextHod = false

@@ -47,11 +47,6 @@ class Player(
     var income by mutableStateOf(0)
     var sale by mutableStateOf(0)
 
-
-    init {
-
-    }
-
     fun getKazna(){
         getIncome()
         getSale()
@@ -98,13 +93,11 @@ class Player(
         val farm = economic[Terrain.FARM]?.income ?: 0
 
         income = sumCells * cell + sumFarm*farm
-
     }
 
     fun onTouch(event: MotionEvent) {
         getIncome()
         getSale()
-        //println("when")
         when (event.actionMasked) {
 
             MotionEvent.ACTION_DOWN -> {
@@ -187,13 +180,12 @@ class Player(
     fun Render(renderPlayerIndicator: Boolean)
     {
         val updateRender = touchRender
-        val transparentHexagonBitmap = ImageBitmap.Companion.imageResource(id = R.drawable.transparent_hexagon)
+        val transparentHexagonBitmap = ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
 
-        Canvas(modifier = Modifier.Companion.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             RenderUnits(renderPlayerIndicator)
             RenderFarms()
             RenderPossibleMoves(transparentHexagonBitmap)
-
         }
     }
 
@@ -251,13 +243,6 @@ class Player(
                 if (selectedUnit!=null && i==selectedUnit){
                     scale=(pole.dx/2).toInt()
                 }
-                /*
-                this.TextRender(textMeasurer,
-                    units[i].Movement.toString(),
-                    (pole.poleX+units[i].koorOnPole.x*pole.dx*GlobalDxKoef).toInt(),
-                    pole.poleY+units[i].koorOnPole.y*pole.dx,
-                    25)
-                */
 
                 this.RenderImage(units[i].koorOnPole.x,units[i].koorOnPole.y,pole.dx,pole.dx,image,scale, pole = pole)
 
@@ -293,23 +278,7 @@ class Player(
             }
         }
     }
-/*
-    fun DrawScope.RenderImage(i: Int, j: Int, lx: Int, ly: Int, imageBitmap: ImageBitmap, scale:Int=0, plusX: Int=0, plusY: Int=0)
-    {
-        var l = 0
-        if (i % 2 != 0) {
-            l = pole.dx / 2
-        }
-        val posX = (pole.poleX + i * (lx * GlobalDxKoef)).toInt()
-        val posY = (pole.poleY + j * pole.dx + l).toInt()
 
-        drawImage(
-            image = imageBitmap,
-            dstOffset = IntOffset(posX-scale/2+plusX, posY-scale/2+plusY),
-            dstSize = IntSize(lx+scale, ly+scale)
-        )
-    }
-*/
     fun deleteUnit(massX: Int, massY: Int){
         if (isValidMoveForUnit(massX,massY, selectedUnit!!)){
             for (player in gameScene.listPlayers){
@@ -474,7 +443,7 @@ class Player(
                 // 1. Если юнит НЕ является UNIT4
                 // 2. И защита юнита слабее или такая же как у защиты клетки
                 if (unitTypeInt != unit4 && cellProtection >= unitTypeInt) {
-                    println("11")
+                    //println("11")
                     return false
                 }
             }

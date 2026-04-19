@@ -22,17 +22,14 @@ class ButtonImage(
 ) {
     @Composable
     fun Render(alpha: Float=1f) {
-        // эта строка получает доступ к контексту, он необходим для доступа к картинкам
-        // val context = LocalContext.current
-
         val image = if (type.value == false)
-            ImageBitmap.Companion.imageResource(id = name)
+            ImageBitmap.imageResource(id = name)
         else
-            ImageBitmap.Companion.imageResource(id = name2)
+            ImageBitmap.imageResource(id = name2)
 
         // Canvas создает холст(область для рисования) на весь экран
         Canvas(
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxSize()
         ) {
 

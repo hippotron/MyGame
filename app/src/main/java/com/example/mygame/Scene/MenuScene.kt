@@ -158,21 +158,17 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
         if (editText == null) {
             editText = EditText(context).apply {
 
-                // Критически важно!
                 inputType = InputType.TYPE_CLASS_TEXT // меняет кнопку след строка на enter
-                //imeOptions = EditorInfo.IME_ACTION_DONE
                 maxLines = 1  // только одна строка, не более
-                //isSingleLine = true  // Альтернативный способ
 
                 isFocusable = true
                 isFocusableInTouchMode = true
 
                 // Максимальная длина текста
                 filters = arrayOf(android.text.InputFilter.LengthFilter(10))
-                // Размер текста (в пикселях или sp)
+                // Размер текста
                 textSize = 24f
 
-                // Или через параметры LayoutParams с полями
                 val params = FrameLayout.LayoutParams(
                     (screenX * 0.35).toInt(),
                     ViewGroup.LayoutParams.WRAP_CONTENT
@@ -182,12 +178,12 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                 layoutParams = params // применяем координаты и прямоугольник
 
                 //для телефона
-                // 👇 Обработка Enter на клавиатуре
+                // Обработка Enter на клавиатуре
                 setOnEditorActionListener { v, actionId, event ->
                     println("setOnEditorActionListener++")
-                    if (
-                        actionId == EditorInfo.IME_ACTION_DONE // enter
-                    ) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE ) // enter
+                    {
+
                         hideKeyboard()
 
                         profile_data.DEFAULT_PROFILE.playerName = text.toString()
@@ -201,7 +197,7 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                 }
 
                 // Для ПК
-                // 👇 Обработка физической клавиши Enter
+                // Обработка физической клавиши Enter
                 setOnKeyListener { _, keyCode, event ->
                     if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                         hideKeyboard()
@@ -242,7 +238,7 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
         // Убираем фокус с EditText
         editText?.clearFocus()
 
-        // Удаляем EditText из иерархии view
+        // Удаляем EditText
         val rootView = (context as? Activity)?.findViewById<View>(android.R.id.content) as? ViewGroup
         rootView?.removeView(editText)
         editText = null
