@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
         if (!loadSuccess) {
             // Если файла нет или ошибка загрузки, создаем профиль по умолчанию
-            profile_data.DEFAULT_PROFILE = profile_data("player", UUID.randomUUID())
+            profile_data.DEFAULT_PROFILE = profile_data("Игрок 1", UUID.randomUUID())
             gameStorage.saveToJsonProfile()
         }
 

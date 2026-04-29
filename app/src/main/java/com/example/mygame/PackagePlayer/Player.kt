@@ -348,6 +348,81 @@ class Player(
             gameScene.delivereBuild=false
         }
     }
+/*
+    fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit?): List<koorOnInt>
+    {
+        if ((currentUnit1?.Movement ?: 1) <= 0){
+            return mutableListOf()
+        }
+        // Массив вообще всех возможных ходов
+        val movesAround = mutableSetOf<koorOnInt>() // Set убирает дубликаты around - вокруг
+
+        // Получаем возможные ходы вокруг
+        val verifiedMoves = mutableListOf<koorOnInt>() // verified - проверенные
+        val move =  getmove(X,Y)
+
+        for (i in move){
+            if (pole.mass[i.x][i.y].player==this){
+                verifiedMoves.add(i)
+            }
+        }
+        // Добавляем возможные ходы вокруг ко всем
+        movesAround.addAll(verifiedMoves)
+
+        if (N > 1) {
+            // делаем цикл по возможным ходам вокруг
+            for (move in verifiedMoves) {
+                // получаем возможные ходы от возможного move хода
+                val recursiveMoves = Possible_moves(
+                    move.x,
+                    move.y,
+                    N - 1,
+                    currentUnit1
+                )
+                // добавляем эти возможные ходы ко всем возможным ходам
+                movesAround.addAll(recursiveMoves)
+            }
+        }
+        val mass = mutableStateListOf<koorOnInt>()
+        for (i in movesAround){
+            val t = getmove(i.x,i.y)
+            for (j in t)
+                if (isValidMove(j,selectedUnit!!, bool = false)){
+                    mass.add(j)
+                }
+        }
+        movesAround.addAll(mass)
+        /*
+                val mass = mutableListOf<koorOnInt>()
+                for (i in movesAround){
+                    val d = getmove(i.x,i.y)
+                    for (j in d) {
+                        if (isValidMove(j, lastrecurs = true)){
+                            mass.addAll(d)
+                        }
+                    }
+
+                    //movesAround.addAll(d)
+                }
+                movesAround.addAll(mass)
+                */
+
+        // Получаем список координат ферм для быстрой проверки
+        val farmCoordinates = buildings.map { it.koorOnPole.x to it.koorOnPole.y }.toSet()
+
+        // удаляем фермы из возможных ходов
+        movesAround.removeAll { move ->
+            move.x to move.y in farmCoordinates
+        }
+
+        // Создаем mutable список с текущей позицией
+        val allMoves = mutableListOf(koorOnInt(X, Y))
+        allMoves.addAll(movesAround)
+
+        // возращаем все возможные ходы
+        return allMoves
+    }
+    */
 
     fun Possible_moves(X: Int, Y: Int, N: Int, currentUnit1: Unit?): List<koorOnInt>
     {
@@ -359,22 +434,9 @@ class Player(
 
         // Получаем возможные ходы вокруг
         val verifiedMoves = mutableListOf<koorOnInt>() // verified - проверенные
-        val move =  mutableListOf<koorOnInt>()
-
-        move.add(koorOnInt(X - 1, Y))
-        move.add(koorOnInt(X, Y - 1))
-        move.add(koorOnInt(X + 1, Y))
-        move.add(koorOnInt(X, Y + 1))
-        if (X % 2 == 0) {
-            move.add(koorOnInt(X - 1, Y - 1))
-            move.add(koorOnInt(X + 1, Y - 1))
-        } else{
-            move.add(koorOnInt(X - 1, Y + 1))
-            move.add(koorOnInt(X + 1, Y + 1))
-        }
+        val move =  getmove(X,Y)
 
         for (i in move){
-
             if (isValidMove(i,selectedUnit!!)){
                 verifiedMoves.add(i)
             }
@@ -386,11 +448,30 @@ class Player(
             // делаем цикл по возможным ходам вокруг
             for (move in verifiedMoves) {
                 // получаем возможные ходы от возможного move хода
-                val recursiveMoves = Possible_moves(move.x, move.y, N - 1, currentUnit1)
+                val recursiveMoves = Possible_moves(
+                    move.x,
+                    move.y,
+                    N - 1,
+                    currentUnit1
+                )
                 // добавляем эти возможные ходы ко всем возможным ходам
                 movesAround.addAll(recursiveMoves)
             }
         }
+/*
+        val mass = mutableListOf<koorOnInt>()
+        for (i in movesAround){
+            val d = getmove(i.x,i.y)
+            for (j in d) {
+                if (isValidMove(j, lastrecurs = true)){
+                    mass.addAll(d)
+                }
+            }
+
+            //movesAround.addAll(d)
+        }
+        movesAround.addAll(mass)
+        */
 
         // Получаем список координат ферм для быстрой проверки
         val farmCoordinates = buildings.map { it.koorOnPole.x to it.koorOnPole.y }.toSet()
@@ -408,10 +489,27 @@ class Player(
         return allMoves
     }
 
-    // Функция длч проверки клетки #isValidMove - действительный ход
-    fun isValidMove(koorOnInt: koorOnInt, selectUnit: Int?=null): Boolean
+    fun getmove(X: Int,Y: Int): MutableList<koorOnInt> {
+        val move =  mutableListOf<koorOnInt>()
+
+        move.add(koorOnInt(X - 1, Y))
+        move.add(koorOnInt(X, Y - 1))
+        move.add(koorOnInt(X + 1, Y))
+        move.add(koorOnInt(X, Y + 1))
+        if (X % 2 == 0) {
+            move.add(koorOnInt(X - 1, Y - 1))
+            move.add(koorOnInt(X + 1, Y - 1))
+        } else{
+            move.add(koorOnInt(X - 1, Y + 1))
+            move.add(koorOnInt(X + 1, Y + 1))
+        }
+        return move
+    }
+
+    // Функция для проверки клетки #isValidMove - действительный ход
+    fun isValidMove(koorOnInt: koorOnInt, selectUnit: Int?=null, bool: Boolean=false): Boolean
     {
-        // Проверяем границы массива
+        // Проверяем границы массива поля
         if (koorOnInt.x < 0 || koorOnInt.x >= pole.mass.size || koorOnInt.y < 0 || koorOnInt.y >= pole.mass[0].size) {
             return false
         }
@@ -420,11 +518,16 @@ class Player(
             return false
         }
 
+        if (bool==true && pole.mass[koorOnInt.x][koorOnInt.y].player!=this){
+            return false
+        }
+
+        // Проверяем что не юнит
         val koorPairUnits = units.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
         if (Pair(koorOnInt.x, koorOnInt.y) in koorPairUnits) {
             return false
         }
-
+        // Проверяем что не здание
         val koorPairBuild = buildings.map { Pair(it.koorOnPole.x, it.koorOnPole.y) }
         if (Pair(koorOnInt.x, koorOnInt.y) in koorPairBuild) {
             return false

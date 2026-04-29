@@ -351,6 +351,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
             if (player==0){
                 pole.mass[pole.mass.size-2][1].player=listPlayers[player]
+                //pole.mass[pole.mass.size-1][0].player=listPlayers[player]
                 cellPlayerInit(pole.mass.size-2,1,listPlayers[player])
                 listPlayers[player].units.add(
                     Unit(
@@ -405,8 +406,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     fun addPlayers() {
         val player1 = Player(profile_data.DEFAULT_PROFILE.playerName, pole, 1, economic, image_mass, this, context)
-        val player2 = Player("2_player", pole, 3, economic, image_mass, this, context)
-        //val player3 = Player("Третий", pole, 4, economic, image_mass, this, context)
+        val player2 = Player("Игрок 2", pole, 3, economic, image_mass, this, context)
+        //val player3 = Player("Игрок 3", pole, 4, economic, image_mass, this, context)
         listPlayers = arrayListOf(player1, player2)
     }
 
