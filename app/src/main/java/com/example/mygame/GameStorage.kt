@@ -53,7 +53,7 @@ class GameStorage(private val context: Context) {
             val file = File(context.filesDir, filenameProfile)
             val jsonString = prettyGson.toJson(profile_data.DEFAULT_PROFILE)
             file.writeText(jsonString)
-            println("save")
+            //println("save")
             true
         } catch (e: IOException) {
             e.printStackTrace()
@@ -66,7 +66,7 @@ class GameStorage(private val context: Context) {
             val file = File(context.filesDir, filenameProfile)
             if (file.exists()) {
                 val jsonString = file.readText()
-                println(jsonString)
+                //println(jsonString)
                 gson.fromJson(jsonString, profile_data.DEFAULT_PROFILE::class.java)
                 true
             } else {

@@ -7,6 +7,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -28,11 +29,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.example.mygame.ButtonImage
+import com.example.mygame.ClientForServer.GameApiClient
 import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.GameStorage
 import com.example.mygame.GlobalParam.TextRender
 import com.example.mygame.R
 import com.example.mygame.Scene.ForScene.Scene
+import com.example.mygame.SoundPlayer
 import com.example.mygame.data.profile_data
 
 class MenuScene(override var game: GameEngine, val context: Context): Scene {
@@ -71,8 +74,11 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
     private var editText: EditText? = null
 
     val gameStorage = GameStorage(context)
+    private val gameApiClient = GameApiClient()
 
     var trigerUpdate by mutableStateOf(0)
+
+    val soundPlayer = SoundPlayer(context)
 
     override fun update() {
         // ничего
@@ -99,7 +105,7 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
 
         Canvas(modifier = Modifier.fillMaxSize()) {
             trigerUpdate // для обновления render
-            println("render, ${profile_data.DEFAULT_PROFILE.playerName}")
+            //println("render, ${profile_data.DEFAULT_PROFILE.playerName}")
             TextRender(
                 textMeasurer,
                 name = profile_data.DEFAULT_PROFILE.playerName,
@@ -108,31 +114,42 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                 center=true
             )
         }
-        println("render")
+        //println("render")
 
     }
 
-    override fun onTouchEvent(event: MotionEvent) {
+    override suspend fun onTouchEvent(event: MotionEvent) {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                val a = 500
+                val b = 55
+
+                //val result = gameApiClient.myClass(a = a, b = b)
+
+                //println("a,b =$result")
+
                 game.forceUpdate
                 if (event.pointerCount == 1){
                     val mx = event.x.toInt()
                     val my = event.y.toInt()
 
                     if (button_new_game.click(mx,my)==true){
+                        soundPlayer.play(R.raw.start_game)
                         game.updateScene("Game")
                     }
 
                     if (button_setting.click(mx,my)==true){
+                        soundPlayer.play(R.raw.button)
                         game.updateScene("Setting")
                     }
 
                     if (button_is_look_rupes.click(mx,my)){
+                        soundPlayer.play(R.raw.button)
                         game.updateScene("Rules")
                     }
 
                     if (button_authors.click(mx,my)==true){
+                        soundPlayer.play(R.raw.button)
                         game.updateScene("Authors")
                     }
 
@@ -142,7 +159,8 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                         } else {
                             hideKeyboard()
                         }
-                        println("ll, text = ${profile_data.DEFAULT_PROFILE.playerName}")
+                        soundPlayer.play(R.raw.button)
+                        //println("ll, text = ${profile_data.DEFAULT_PROFILE.playerName}")
                         game.forceUpdate++
                     }
                 }
@@ -180,7 +198,7 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                 //для телефона
                 // Обработка Enter на клавиатуре
                 setOnEditorActionListener { v, actionId, event ->
-                    println("setOnEditorActionListener++")
+                    //println("setOnEditorActionListener++")
                     if (actionId == EditorInfo.IME_ACTION_DONE ) // enter
                     {
 
@@ -203,7 +221,7 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                         hideKeyboard()
 
                         profile_data.DEFAULT_PROFILE.playerName = text.toString()
-                        println("enter клавиатура пк, ${profile_data.DEFAULT_PROFILE.playerName}")
+                        //println("enter клавиатура пк, ${profile_data.DEFAULT_PROFILE.playerName}")
                         gameStorage.saveToJsonProfile()
                         trigerUpdate++
                         true

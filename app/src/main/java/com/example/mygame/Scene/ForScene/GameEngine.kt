@@ -1,8 +1,12 @@
 package com.example.mygame.Scene.ForScene
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.mygame.R
+import com.example.mygame.SoundPlayer
+import io.ktor.client.plugins.cookies.HttpCookies
 
 class GameEngine(){
     var CurrentScene by mutableStateOf("Menu")

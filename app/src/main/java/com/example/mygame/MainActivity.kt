@@ -20,6 +20,9 @@ import com.example.mygame.Scene.RulesScene
 import com.example.mygame.Scene.ForScene.Scene
 import com.example.mygame.Scene.SettingScene
 import com.example.mygame.data.profile_data
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +31,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
 
         // Фиксируем вертикальную ориентацию
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -43,6 +48,7 @@ class MainActivity : ComponentActivity() {
 
         gameEngine.CurrentScene = "Menu"
 
+        SoundPlayer(context = this)
 
         val gameStorage = GameStorage(this)
         val loadSuccess = gameStorage.loadFromJsonProfile()
@@ -72,12 +78,15 @@ class MainActivity : ComponentActivity() {
 
                         // Вызываем onEnter для новой сцены
                         scene?.onEnter()
-                        println(gameEngine.backScene)
+                        //println(gameEngine.backScene)
                     }
                     previousScene.value = currentScene
                 }
 
                 scene?.update()
+
+                // Создаём scope в MainActivity
+                val mainScope = CoroutineScope(Dispatchers.Main)
 
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
@@ -89,11 +98,12 @@ class MainActivity : ComponentActivity() {
                     update = { view ->
                         // создаем event, это обьект с координатами и типом касания(MOVE, DOWN, UP)
                         view.setOnTouchListener { _, event ->
-                            // используем event в функции
-                            scene?.onTouchEvent(event)
-                            // true означает конкц события
+                            mainScope.launch {  // ✅ запускаем корутину
+                                scene?.onTouchEvent(event)
+                            }
                             true
                         }
+
                     }
                 )
 

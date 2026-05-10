@@ -1,5 +1,6 @@
 package com.example.mygame
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -18,8 +19,9 @@ class ButtonImage(
     var dy: Int,
     val name: Int,
     val name2: Int = name,
-    var type: MutableState<Boolean> = mutableStateOf(false)  // Используем State
+    var type: MutableState<Boolean> = mutableStateOf(false),  // Используем State
 ) {
+
     @Composable
     fun Render(alpha: Float=1f) {
         val image = if (type.value == false)

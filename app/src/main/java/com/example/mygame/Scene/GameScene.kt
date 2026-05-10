@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -38,12 +39,15 @@ import com.example.mygame.PackagePlayer.OtherForPlayer.Unit
 import com.example.mygame.PackagePlayer.OtherForPlayer.Unit_data
 import com.example.mygame.Pole.Data_cell
 import com.example.mygame.Scene.ForScene.Scene
+import com.example.mygame.SoundPlayer
 import com.example.mygame.data.GameMap_data
 import com.example.mygame.data.Pole_data
 import com.example.mygame.data.player_data
 import com.example.mygame.data.profile_data
 import java.io.File
 import kotlin.collections.iterator
+import android.os.Handler
+import android.os.Looper
 
 class GameScene(override var game: GameEngine, val context: Context) : Scene {
     val displayMetrics = context.resources.displayMetrics
@@ -182,6 +186,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     var isSaved: Boolean? by mutableStateOf(null)
     var isDownload: Boolean? by mutableStateOf(null)
+
+    private val soundPlayer = SoundPlayer(context)
+    var isSoundVictory = true
 
     init {
         createPLayers()
@@ -398,7 +405,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     fun cellPlayerInit(X: Int, Y: Int, player: Player) {
         val cells = cells_around(X, Y)
-        println(cells.toString())
+        //println(cells.toString())
         for (i in cells){
             pole.mass[i.x][i.y].player=player
         }
@@ -570,7 +577,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
             // путь к файлу
             val filePath = File(context.filesDir, name_json).absolutePath
-            println("Карта сохранена в: $filePath")
+            //println("Карта сохранена в: $filePath")
             isSaved=true
             isDownload=null
         } catch (e: Error){
@@ -632,7 +639,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             for (i in poleData.indices) {
                 for (j in poleData[i].indices) {
                     if (poleData[i][j].player != null) {
-                        println(poleData[i][j].player!!)
+                        //println(poleData[i][j].player!!)
                         pole.mass[i][j].player = listPlayers[poleData[i][j].player!!]
                         pole.mass[i][j].protection = poleData[i][j].protection
                         pole.mass[i][j].land = poleData[i][j].land
@@ -681,7 +688,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent) {
+    override suspend fun onTouchEvent(event: MotionEvent) {
         val listPLayersHadCells = getListPlayersHadCells()
 
         if (!isPauseMenu) {
@@ -708,7 +715,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
                         // Обработка кнопки buildings
                         if (!delivereNextHod && buildSettings.click(mx, my)) {
-
+                            soundPlayer.play(R.raw.button)
                             update_price_farm()
 
                             delivereBuild = !delivereBuild
@@ -720,6 +727,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
                         // Обработка кнопки units
                         if (!delivereNextHod && unitSettings.click(mx, my)) {
+                            soundPlayer.play(R.raw.button)
                             delivereUnit = !delivereUnit
                             if (delivereUnit) {
                                 selectAddUnit = Terrain.NONE
@@ -729,9 +737,11 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
                         if (delivereNextHod) {
                             if (check_mark.click(mx, my)) {
+                                soundPlayer.play(R.raw.hod)
                                 nextHodPlayer()
                             }
                             if (cross.click(mx, my)) {
+                                soundPlayer.play(R.raw.button)
                                 delivereNextHod = false
                                 delivereUnit = false
                                 delivereBuild = false
@@ -743,7 +753,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                             for (i in unitButtonsMap) {
                                 if (i.value.click(mx, my)) {
                                     selectAddUnit = i.key
-                                    println(selectAddUnit)
+                                    //println(selectAddUnit)
                                     i.value.type.value = true
                                     break
                                 }
@@ -771,6 +781,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
                         } else {
                             if (exit_win.click(mx, my)) {
+                                soundPlayer.play(R.raw.button)
                                 pole = Pole(context = context)
                                 createPLayers()
                                 game.CurrentScene = "Menu"
@@ -792,28 +803,33 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                         // Меню паузы
 
                         if (buttonSave.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             save_update_json()
-
                         }
                         if (buttonDownload.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             load_json()
                         }
 
                         if (button_return_in_game.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             isPauseMenu = false
                             isSaved=null
                             isDownload=null
                             return
                         }
                         if (button_setting.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             game.updateScene("Setting")
                             return
                         }
                         if (button_is_look_rupes.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             game.updateScene("Rules")
                         }
 
                         if (button_return_in_menu.click(mx,my)){
+                            soundPlayer.play(R.raw.button)
                             game.updateScene("Menu")
                             return
                         }
@@ -826,6 +842,73 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         game.forceUpdate++
 
     }
+    @Composable
+    fun victoryRender(textMeasurer: TextMeasurer){
+        val listPLayersHadCells = getListPlayersHadCells()
+
+        // Воспроизводим звук победы только один раз
+        if (isSoundVictory) {
+            soundPlayer.play(R.raw.victory, loop = false, volume = 1.0f)
+            isSoundVictory = false
+        }
+
+        Image(
+            painter = painterResource(id = R.drawable.background_win),
+            contentDescription = "фон",
+            contentScale = ContentScale.Companion.FillBounds,
+            modifier = Modifier.Companion.fillMaxSize()
+        )
+
+        mini_fon_for_win.Render()
+        exit_win.Render()
+        val winnerPlayer = listPLayersHadCells[0]
+
+        val imageBitmaps = remember {
+            pole.image_mass.map { resourceId ->
+                BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
+            }
+        }
+
+        Canvas(
+            modifier = Modifier.Companion
+                .fillMaxSize()
+        ) {
+            TextRender(
+                textMeasurer,
+                "Конец игры",
+                (pole.display.x * 0.5).toInt(),
+                (pole.display.y * 0.18).toInt(),
+                40,
+                true,
+                center = true
+            )
+            TextRender(
+                textMeasurer,
+                "Победитель",
+                (pole.display.x * 0.5).toInt(),
+                (pole.display.y * 0.25).toInt(),
+                35,
+                center = true
+            )
+            TextRender(
+                textMeasurer,
+                listPlayers[winnerPlayer].name,
+                (pole.display.x * 0.5).toInt(),
+                (pole.display.y * 0.31).toInt(),
+                30,
+                center = true
+
+            )
+            drawImage(
+                image = imageBitmaps[listPlayers[winnerPlayer].color],
+                dstOffset = IntOffset(
+                    (pole.display.x * 0.7).toInt(),
+                    (pole.display.y * 0.31).toInt()
+                ),
+                dstSize = IntSize(pole.dx, pole.dx)
+            )
+        }
+    }
 
     @Composable
     override fun render() {
@@ -836,62 +919,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         val transparentHexagonBitmap = ImageBitmap.Companion.imageResource(id = R.drawable.transparent_hexagon)
         // win
         if (listPLayersHadCells.size==1){
-            Image(
-                painter = painterResource(id = R.drawable.background_win),// Укажите ваш файл
-                contentDescription = "фон", // Описание для доступности (обязательно!)
-                contentScale = ContentScale.Companion.FillBounds,
-                modifier = Modifier.Companion.fillMaxSize()
-            )
-
-            mini_fon_for_win.Render()
-            exit_win.Render()
-            val winnerPlayer = listPLayersHadCells[0]
-
-            val imageBitmaps = remember {
-                pole.image_mass.map { resourceId ->
-                    BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
-                }
-            }
-
-            Canvas(
-                modifier = Modifier.Companion
-                    .fillMaxSize()
-            ) {
-                TextRender(
-                    textMeasurer,
-                    "Конец игры",
-                    (pole.display.x * 0.5).toInt(),
-                    (pole.display.y * 0.18).toInt(),
-                    40,
-                    true,
-                    center = true
-                )
-                TextRender(
-                    textMeasurer,
-                    "Победитель",
-                    (pole.display.x * 0.5).toInt(),
-                    (pole.display.y * 0.25).toInt(),
-                    35,
-                    center = true
-                )
-                TextRender(
-                    textMeasurer,
-                    listPlayers[winnerPlayer].name,
-                    (pole.display.x * 0.5).toInt(),
-                    (pole.display.y * 0.31).toInt(),
-                    30,
-                    center = true
-
-                )
-                drawImage(
-                    image = imageBitmaps[listPlayers[winnerPlayer].color],
-                    dstOffset = IntOffset(
-                        (pole.display.x * 0.7).toInt(),
-                        (pole.display.y * 0.31).toInt()
-                    ),
-                    dstSize = IntSize(pole.dx, pole.dx)
-                )
-            }
+            victoryRender(textMeasurer)
         }
         else {
             Image(
@@ -1210,6 +1238,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         isDownload=null
         hod_player = 0
 
+        // Сбрасываем флаг победы при входе в сцену
+        isSoundVictory = true
+
         // Сбрасываем состояния выбора
         delivereBuild = false
         delivereUnit = false
@@ -1232,6 +1263,6 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     }
 
     override fun onExit() {
-
+        soundPlayer.release()
     }
 }

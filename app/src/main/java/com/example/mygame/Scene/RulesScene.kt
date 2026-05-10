@@ -23,6 +23,7 @@ import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.GlobalParam.TextRender
 import com.example.mygame.R
 import com.example.mygame.Scene.ForScene.Scene
+import com.example.mygame.SoundPlayer
 import com.example.mygame.Terrain
 
 class RulesScene (override var game: GameEngine, val context: Context, val economic: HashMap<Terrain, Economic>):
@@ -56,12 +57,14 @@ class RulesScene (override var game: GameEngine, val context: Context, val econo
 
     var slide by mutableStateOf(1)
 
+    private val soundPlayer = SoundPlayer(context)
+
     override fun update() {
 
     }
 
-    override fun onTouchEvent(event: MotionEvent) {
-        println("$screenX, $screenY, $size_text")
+    override suspend fun onTouchEvent(event: MotionEvent) {
+        //println("$screenX, $screenY, $size_text")
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 val mx = event.x.toInt()
@@ -69,6 +72,7 @@ class RulesScene (override var game: GameEngine, val context: Context, val econo
 
                 if (slide==2 || slide==3) {
                     if (button_arrow_left.click(mx,my)) {
+                        //soundPlayer.play(R.raw.button)
                         slide--
                         //println("--")
                     }
@@ -76,12 +80,14 @@ class RulesScene (override var game: GameEngine, val context: Context, val econo
                 }
                 if (slide==1 || slide==2) {
                     if (button_arrow_right.click(mx,my)) {
+                        //soundPlayer.play(R.raw.button)
                         slide++
                         //println("++")
                     }
                 }
 
                 if (button_return.click(mx,my)){
+                    //soundPlayer.play(R.raw.button)
                     game.goBackScene()
                 }
 

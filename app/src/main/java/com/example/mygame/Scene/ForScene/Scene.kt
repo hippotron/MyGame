@@ -15,7 +15,7 @@ interface Scene {
     fun render()
 
     // Обработка касаний
-    fun onTouchEvent(event: MotionEvent)
+    suspend fun onTouchEvent(event: MotionEvent)
 
     // Вызывается при переходе на эту сцену (инициализация)
     fun onEnter()

@@ -15,6 +15,7 @@ import com.example.mygame.ButtonImage
 import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.R
 import com.example.mygame.Scene.ForScene.Scene
+import com.example.mygame.SoundPlayer
 
 class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
     override fun update() {
@@ -28,6 +29,8 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
         (screenXpx * 0.1).toInt(), (screenYpx * 0.07).toInt(),
         (screenXpx * 0.3).toInt(), (screenYpx * 0.1).toInt(), R.drawable.image_return
     )
+
+    private val soundPlayer = SoundPlayer(context)
 
     @Composable
     override fun render() {
@@ -47,7 +50,7 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
         button_return.Render()
     }
 
-    override fun onTouchEvent(event: MotionEvent) {
+    override suspend fun onTouchEvent(event: MotionEvent) {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
 
@@ -59,6 +62,7 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
                 if (event.pointerCount == 1) {
                     if (button_return.click(mx,my)==true){
                         //Log.d("","ttt")
+                        //soundPlayer.play(R.raw.button)
                         game.goBackScene()
                     }
                 }
