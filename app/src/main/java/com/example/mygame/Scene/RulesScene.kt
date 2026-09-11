@@ -33,9 +33,10 @@ class RulesScene (override var game: GameEngine, val context: Context, val econo
     val screenX = displayMetrics.widthPixels
     val screenY = displayMetrics.heightPixels
 
+    // Тот же размер, что у кнопок главного меню
     val button_return = ButtonImage(
-        (screenX * 0.05).toInt(), (screenY * 0.035).toInt(),
-        (screenX * 0.3).toInt(), (screenY * 0.1).toInt(), R.drawable.image_return
+        (screenX * 0.15).toInt(), (screenY * 0.04).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.image_return
     )
 
     val mini_fon = ButtonImage(

@@ -111,24 +111,25 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         R.drawable.cross
     )
 
+    // Столбец паузы — те же пропорции, что у кнопок главного меню
     val button_return_in_game = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.41).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.return_in_game
+        (screenX * 0.15).toInt(), (screenY * 0.48).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.return_in_game
     )
 
     val button_setting = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.515).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.settings
+        (screenX * 0.15).toInt(), (screenY * 0.585).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.settings
     )
 
     val button_is_look_rupes = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.62).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.is_look_rules
+        (screenX * 0.15).toInt(), (screenY * 0.69).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.is_look_rules
     )
 
     val button_return_in_menu = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.725).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.return_in_menu
+        (screenX * 0.15).toInt(), (screenY * 0.795).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.return_in_menu
     )
 
     val backGround_for_pause_menu = ButtonImage(

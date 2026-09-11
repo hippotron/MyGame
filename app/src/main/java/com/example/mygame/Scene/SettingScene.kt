@@ -20,9 +20,10 @@ class SettingScene(override var game: GameEngine, context: Context) : Scene {
     val screenXpx = displayMetrics.widthPixels.toFloat()
     val screenYpx = displayMetrics.heightPixels.toFloat()
 
+    // Тот же размер, что у кнопок главного меню
     val button_return = ButtonImage(
-        (screenXpx * 0.1).toInt(), (screenYpx * 0.07).toInt(),
-        (screenXpx * 0.3).toInt(), (screenYpx * 0.1).toInt(), R.drawable.image_return
+        (screenXpx * 0.15).toInt(), (screenYpx * 0.04).toInt(),
+        (screenXpx * 0.7).toInt(), (screenYpx * 0.095).toInt(), R.drawable.image_return
     )
 
     private val soundPlayer = SoundPlayer(context)

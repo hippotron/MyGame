@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -43,29 +44,31 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
     val screenX = displayMetrics.widthPixels
     val screenY = displayMetrics.heightPixels
 
+    // Кнопки поверх острова на фоне, единый размер ~70% x 9.5%
     val button_new_game = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.41).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.new_game
+        (screenX * 0.15).toInt(), (screenY * 0.48).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.new_game
     )
 
     val button_setting = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.515).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.settings
+        (screenX * 0.15).toInt(), (screenY * 0.585).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.settings
     )
 
     val button_is_look_rupes = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.62).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.is_look_rules
+        (screenX * 0.15).toInt(), (screenY * 0.69).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.is_look_rules
     )
 
     val button_authors = ButtonImage(
-        (screenX * 0.2).toInt(), (screenY * 0.725).toInt(),
-        (screenX * 0.6).toInt(), (screenY * 0.1).toInt(), R.drawable.authors
+        (screenX * 0.15).toInt(), (screenY * 0.795).toInt(),
+        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.authors
     )
 
+    val profileSize = (screenX * 0.16).toInt()
     val button_propfil = ButtonImage(
-        (screenX * 0.05).toInt(), (screenY * 0.05).toInt(),
-        (screenX * 0.2).toInt(), (screenY * 0.1).toInt(), R.drawable.profile
+        (screenX * 0.04).toInt(), (screenY * 0.04).toInt(),
+        profileSize, profileSize, R.drawable.profile
     )
 
     // 👇 ПЕРЕМЕННЫЕ
@@ -106,12 +109,16 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
         Canvas(modifier = Modifier.fillMaxSize()) {
             trigerUpdate // для обновления render
             //println("render, ${profile_data.DEFAULT_PROFILE.playerName}")
+            // Имя сразу справа от профиля (как на макете)
             TextRender(
                 textMeasurer,
                 name = profile_data.DEFAULT_PROFILE.playerName,
-                (screenX*0.5).toInt(),
-                (screenY*0.08).toInt(),
-                center=true
+                (screenX * 0.04).toInt() + profileSize + (screenX * 0.03).toInt(),
+                (screenY * 0.07).toInt(),
+                size = 22,
+                bold = true,
+                center = false,
+                color = Color.White
             )
         }
         //println("render")
@@ -188,11 +195,12 @@ class MenuScene(override var game: GameEngine, val context: Context): Scene {
                 textSize = 24f
 
                 val params = FrameLayout.LayoutParams(
-                    (screenX * 0.35).toInt(),
+                    (screenX * 0.45).toInt(),
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 ) // это размер прямоугольника в котором можно выбрать элемент в тексте
-                params.leftMargin = (screenX * 0.35).toInt() // koor по x
-                params.topMargin = (screenY * 0.1).toInt() // koor по y
+                // Синхронно с позицией имени рядом с профилем
+                params.leftMargin = (screenX * 0.04).toInt() + profileSize + (screenX * 0.03).toInt()
+                params.topMargin = (screenY * 0.055).toInt()
                 layoutParams = params // применяем координаты и прямоугольник
 
                 //для телефона

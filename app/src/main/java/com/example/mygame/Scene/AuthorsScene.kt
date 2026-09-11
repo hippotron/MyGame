@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mygame.ButtonImage
 import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.R
@@ -25,9 +27,10 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
     val screenXpx = displayMetrics.widthPixels
     val screenYpx = displayMetrics.heightPixels
 
+    // Тот же размер, что у кнопок главного меню
     val button_return = ButtonImage(
-        (screenXpx * 0.1).toInt(), (screenYpx * 0.07).toInt(),
-        (screenXpx * 0.3).toInt(), (screenYpx * 0.1).toInt(), R.drawable.image_return
+        (screenXpx * 0.15).toInt(), (screenYpx * 0.04).toInt(),
+        (screenXpx * 0.7).toInt(), (screenYpx * 0.095).toInt(), R.drawable.image_return
     )
 
     private val soundPlayer = SoundPlayer(context)
@@ -43,8 +46,10 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
         )
 
         Text(
-            modifier = Modifier.offset(150.dp,150.dp),
-            text = "Авторы"
+            modifier = Modifier.offset(x = 120.dp, y = 120.dp),
+            text = "Авторы",
+            color = Color.White,
+            fontSize = 28.sp
         )
 
         button_return.Render()
