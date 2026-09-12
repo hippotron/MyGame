@@ -785,7 +785,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                                 soundPlayer.play(R.raw.button)
                                 pole = Pole(context = context)
                                 createPLayers()
-                                game.CurrentScene = "Menu"
+                                game.updateScene("Menu")
                             }
                         }
 

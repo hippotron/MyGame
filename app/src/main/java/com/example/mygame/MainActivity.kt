@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.mygame.Scene.AuthorsScene
 import com.example.mygame.Scene.ForScene.GameEngine
+import com.example.mygame.Scene.ForScene.SceneTransitionOverlay
 import com.example.mygame.Scene.GameScene
 import com.example.mygame.Scene.MenuScene
 import com.example.mygame.Scene.RulesScene
@@ -98,6 +100,9 @@ class MainActivity : ComponentActivity() {
                     update = { view ->
                         // создаем event, это обьект с координатами и типом касания(MOVE, DOWN, UP)
                         view.setOnTouchListener { _, event ->
+                            if (gameEngine.isTransitioning) {
+                                return@setOnTouchListener true
+                            }
                             mainScope.launch {  // ✅ запускаем корутину
                                 scene?.onTouchEvent(event)
                             }
@@ -108,6 +113,9 @@ class MainActivity : ComponentActivity() {
                 )
 
                 scene?.render()
+                Box(modifier = Modifier.matchParentSize()) {
+                    SceneTransitionOverlay(gameEngine)
+                }
             }
         }
     }
