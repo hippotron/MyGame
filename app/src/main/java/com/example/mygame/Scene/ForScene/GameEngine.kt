@@ -40,7 +40,7 @@ class GameEngine(){
     // номер запуска анимации, чтобы оверлей начал фазу заново
     var pendingScene: String? = null
     // сцена, которую покажем в чёрном кадре
-    var phaseDurationMs: Long = 920L
+    var phaseDurationMs: Long = 670
     // длительность Close и Open
     var blackHoldMs: Long = 80L
     // пауза полной черноты перед сменой сцены
