@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,23 +13,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.mygame.ButtonImage
 import com.example.mygame.Economic
+import com.example.mygame.GameHudLayout
+import com.example.mygame.GameHudRender
 import com.example.mygame.GameStorage
 import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.GlobalParam.RenderImage
-import com.example.mygame.GlobalParam.TextRender
 import com.example.mygame.PackageForKoor.koorOnInt
 import com.example.mygame.PackagePlayer.OtherForPlayer.Build
 import com.example.mygame.PackagePlayer.Player
@@ -54,88 +53,29 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     val screenX = displayMetrics.widthPixels
     val screenY = displayMetrics.heightPixels
 
+    val layout = GameHudLayout(screenX, screenY)
+    private val hudRender = GameHudRender()
+    private val hitboxDrawable = R.drawable.transparent_hexagon
+
     var pole = Pole(context = context)
 
-    val button_point_back = ButtonImage(
-        (screenX * 0.9).toInt(), (screenY * 0.1).toInt(),
-        (screenX * 0.05).toInt(), (screenY * 0.1).toInt(), R.drawable.point
-    )
-    val button_next_hod = ButtonImage(
-        (screenX * 0.8).toInt(), (screenY * 0.9).toInt(),
-        (screenX * 0.14).toInt(), (screenY * 0.07).toInt(), R.drawable.arrow_next_hod
-    )
-
-    val mini_fon_for_win = ButtonImage(
-        (screenX * 0.1).toInt(), (screenY * 0.1).toInt(),
-        (screenX * 0.8).toInt(), (screenY * 0.8).toInt(), R.drawable.mini_fon
-    )
-
-    val mini_fon_for_up_game = ButtonImage(
-        -10, 0,
-        screenX + 20, (screenY * 0.1).toInt(), R.drawable.mini_fon
-    )
+    val button_point_back = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val button_next_hod = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
     var mini_fon_for_down_game = ButtonImage(
-        -10, (screenY - screenY * 0.1).toInt(),
-        screenX + 20, (screenY * 0.1).toInt(), R.drawable.mini_fon
+        0, layout.bottomBarY,
+        screenX, layout.bottomCollapsedH, hitboxDrawable
     )
 
-    var mini_fon_for_pause_menu = ButtonImage(
-        (screenX * 0.13).toInt(), (screenY * 0.37).toInt(),
-        (screenX * 0.735).toInt(), (screenY * 0.5).toInt(), R.drawable.mini_fon
-    )
+    val exit_win = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
-    val exit_win = ButtonImage(
-        (screenX * 0.65).toInt(), (screenY * 0.77).toInt(),
-        (screenX * 0.2).toInt(), (screenY * 0.1).toInt(), R.drawable.image_return_mirror
-    )
+    val check_mark = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val cross = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
-    val leo_koin = ButtonImage(
-        (screenX * 0.05).toInt(), (screenY * 0.055).toInt(),
-        (screenX * 0.08).toInt(), (screenY * 0.04).toInt(), R.drawable.leo_koin
-    )
-
-    val check_mark = ButtonImage(
-        (pole.display.x * 0.35).toInt(),
-        (pole.display.y * 0.83).toInt(),
-        (screenX * 0.08).toInt(),
-        (screenY * 0.04).toInt(),
-        R.drawable.check_mark
-    )
-
-    val cross = ButtonImage(
-        (pole.display.x * 0.65).toInt(),
-        (pole.display.y * 0.83).toInt(),
-        (screenX * 0.08).toInt(),
-        (screenY * 0.04).toInt(),
-        R.drawable.cross
-    )
-
-    // Столбец паузы — те же пропорции, что у кнопок главного меню
-    val button_return_in_game = ButtonImage(
-        (screenX * 0.15).toInt(), (screenY * 0.48).toInt(),
-        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.return_in_game
-    )
-
-    val button_setting = ButtonImage(
-        (screenX * 0.15).toInt(), (screenY * 0.585).toInt(),
-        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.settings
-    )
-
-    val button_is_look_rupes = ButtonImage(
-        (screenX * 0.15).toInt(), (screenY * 0.69).toInt(),
-        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.is_look_rules
-    )
-
-    val button_return_in_menu = ButtonImage(
-        (screenX * 0.15).toInt(), (screenY * 0.795).toInt(),
-        (screenX * 0.7).toInt(), (screenY * 0.095).toInt(), R.drawable.return_in_menu
-    )
-
-    val backGround_for_pause_menu = ButtonImage(
-        0, 0,
-        screenX, screenY, R.drawable.background_black
-    )
+    val button_return_in_game = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val button_setting = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val button_is_look_rupes = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val button_return_in_menu = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
     var hod_player by mutableStateOf(0)
 
@@ -156,31 +96,11 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     var selectAddUnit: Terrain = Terrain.NONE
     var selectAddBulid: Terrain = Terrain.NONE
 
-    val buildSettings = ButtonImage(
-        (pole.display.x * 0.29).toInt(),
-        (pole.display.y * 0.89).toInt(),
-        (pole.display.x * 0.21).toInt(),
-        (pole.display.y * 0.1).toInt(),
-        R.drawable.farm
-    )
+    val buildSettings = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val unitSettings = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
-    val unitSettings = ButtonImage(
-        (pole.display.x * 0.6).toInt(),
-        (pole.display.y * 0.9).toInt(),
-        (pole.display.x * 0.21).toInt(),
-        (pole.display.y * 0.09).toInt(),
-        R.drawable.skeleton
-    )
-
-    val buttonDownload = ButtonImage(
-        (screenX * 0.5).toInt(), (screenY * 0.3).toInt(),
-        (screenX * 0.2).toInt(), (screenY * 0.1).toInt(), R.drawable.download
-    )
-
-    val buttonSave = ButtonImage(
-        (screenX * 0.3).toInt(), (screenY * 0.3).toInt(),
-        (screenX * 0.2).toInt(), (screenY * 0.1).toInt(), R.drawable.save
-    )
+    val buttonDownload = ButtonImage(0, 0, 1, 1, hitboxDrawable)
+    val buttonSave = ButtonImage(0, 0, 1, 1, hitboxDrawable)
 
     var unitButtonsMap = HashMap<Terrain, ButtonImage>()
     var buildButtonMap = HashMap<Terrain, ButtonImage>()
@@ -195,80 +115,138 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         createPLayers()
         initImage()
         initEconomic2()
-        initButtonUnit()  // Инициализируем здесь
-        initButtonBuild() // Инициализируем здесь
+        applyHudHitboxes()
+        syncBottomPanel(false)
     }
 
-    // Переносим методы инициализации кнопок
-    fun initButtonUnit() {
-        val b1 = ButtonImage(
-            (pole.display.x * 0.25).toInt(),
-            (pole.display.y * 0.77).toInt(),
-            150,
-            150,
-            R.drawable.skeleton,
-            name2 = R.drawable.dedicated_skeleton,
-            type = mutableStateOf(false)
-        )
-        unitButtonsMap[Terrain.UNIT1]=b1
+    fun applyHudHitboxes() {
+        button_point_back.x = layout.hamburgerX
+        button_point_back.y = layout.hamburgerY
+        button_point_back.dx = layout.hamburgerSize
+        button_point_back.dy = layout.hamburgerSize
 
-        val b2 = ButtonImage(
-            (pole.display.x * 0.42).toInt(),
-            (pole.display.y * 0.77).toInt(),
-            150, 150,
-            R.drawable.barbarian,
-            name2 = R.drawable.dedicated_barbarin,
-            type = mutableStateOf(false)
-        )
-        unitButtonsMap[Terrain.UNIT2]=b2
-        val b3 = ButtonImage(
-            (pole.display.x * 0.58).toInt(),
-            (pole.display.y * 0.77).toInt(),
-            150, 150,
-            R.drawable.knight,
-            name2 = R.drawable.dedicated_knight,
-            type = mutableStateOf(false)
-        )
-        unitButtonsMap[Terrain.UNIT3]=b3
-        val b4 = ButtonImage(
-            (pole.display.x * 0.75).toInt(),
-            (pole.display.y * 0.77).toInt(),
-            150, 150,
-            R.drawable.hard_khight,
-            name2 = R.drawable.dedicated_hard_knight,
-            type = mutableStateOf(false)
-        )
-        unitButtonsMap[Terrain.UNIT4]=b4
+        buildSettings.x = layout.tabX0
+        buildSettings.y = layout.tabY
+        buildSettings.dx = layout.tabW
+        buildSettings.dy = layout.tabH
+
+        unitSettings.x = layout.tabX1
+        unitSettings.y = layout.tabY
+        unitSettings.dx = layout.tabW
+        unitSettings.dy = layout.tabH
+
+        button_next_hod.x = layout.endTurnX
+        button_next_hod.y = layout.tabY
+        button_next_hod.dx = layout.endTurnW
+        button_next_hod.dy = layout.endTurnH
+
+        val modalBtnW = (screenX * 0.22).toInt()
+        val modalBtnH = (screenY * 0.055).toInt()
+        val modalBtnY = layout.endTurnModalY() + layout.endTurnModalH() - modalBtnH - (screenY * 0.04).toInt()
+        val modalInnerPad = (layout.endTurnModalW() * 0.12).toInt()
+        cross.x = layout.endTurnModalX() + modalInnerPad
+        cross.y = modalBtnY
+        cross.dx = modalBtnW
+        cross.dy = modalBtnH
+        check_mark.x = layout.endTurnModalX() + layout.endTurnModalW() - modalInnerPad - modalBtnW
+        check_mark.y = modalBtnY
+        check_mark.dx = modalBtnW
+        check_mark.dy = modalBtnH
+
+        val pad = (layout.pauseCardW * 0.08).toInt()
+        val saveW = (layout.pauseCardW * 0.38).toInt()
+        val saveH = (layout.screenY * 0.07).toInt()
+        buttonSave.x = layout.pauseCardX + pad
+        buttonSave.y = layout.pauseCardY + (layout.pauseCardH * 0.22).toInt()
+        buttonSave.dx = saveW
+        buttonSave.dy = saveH
+        buttonDownload.x = layout.pauseCardX + layout.pauseCardW - pad - saveW
+        buttonDownload.y = buttonSave.y
+        buttonDownload.dx = saveW
+        buttonDownload.dy = saveH
+
+        val colX = layout.pauseCardX + pad
+        val colW = layout.pauseCardW - pad * 2
+        val colH = (screenY * 0.068).toInt()
+        var colY = buttonSave.y + saveH + (screenY * 0.055).toInt()
+        button_return_in_game.x = colX
+        button_return_in_game.y = colY
+        button_return_in_game.dx = colW
+        button_return_in_game.dy = colH
+        colY += colH + (screenY * 0.01).toInt()
+        button_setting.x = colX
+        button_setting.y = colY
+        button_setting.dx = colW
+        button_setting.dy = colH
+        colY += colH + (screenY * 0.01).toInt()
+        button_is_look_rupes.x = colX
+        button_is_look_rupes.y = colY
+        button_is_look_rupes.dx = colW
+        button_is_look_rupes.dy = colH
+        colY += colH + (screenY * 0.01).toInt()
+        button_return_in_menu.x = colX
+        button_return_in_menu.y = colY
+        button_return_in_menu.dx = colW
+        button_return_in_menu.dy = colH
+
+        exit_win.x = layout.winCardX + (layout.winCardW * 0.12).toInt()
+        exit_win.y = layout.winCardY + layout.winCardH - (screenY * 0.12).toInt()
+        exit_win.dx = (layout.winCardW * 0.76).toInt()
+        exit_win.dy = (screenY * 0.08).toInt()
+
+        initButtonUnit()
+        initButtonBuild()
+    }
+
+    fun syncBottomPanel(shopOpen: Boolean) {
+        if (shopOpen) {
+            mini_fon_for_down_game.y = layout.expandedBottomY()
+            mini_fon_for_down_game.dy = layout.expandedBottomH()
+            pole.ogranichenie.max.y = layout.expandedBottomY()
+        } else {
+            mini_fon_for_down_game.y = layout.bottomBarY
+            mini_fon_for_down_game.dy = layout.bottomCollapsedH
+            pole.ogranichenie.max.y =
+                pole.ogranichenie.min.y + (pole.mass[0].size) * pole.minDx + pole.minDx / 2
+        }
+    }
+
+    fun initButtonUnit() {
+        unitButtonsMap.clear()
+        val unitOrder = listOf(Terrain.UNIT1, Terrain.UNIT2, Terrain.UNIT3, Terrain.UNIT4)
+        val w = layout.unitCardW()
+        val h = layout.unitCardH()
+        val y = layout.shopCardsY()
+        unitOrder.forEachIndexed { index, terrain ->
+            unitButtonsMap[terrain] = ButtonImage(
+                layout.unitCardX(index),
+                y,
+                w,
+                h,
+                hitboxDrawable,
+                name2 = hitboxDrawable,
+                type = mutableStateOf(false)
+            )
+        }
     }
 
     fun initButtonBuild() {
-        val b1 = ButtonImage(
-            (pole.display.x * 0.25).toInt(),
-            (pole.display.y * 0.76).toInt(),
-            150, 150,
-            R.drawable.farm,
-            name2 = R.drawable.dedicated_farm,
-            type = mutableStateOf(false)
-        )
-        buildButtonMap[Terrain.FARM]=b1
-        val b2 = ButtonImage(
-            (pole.display.x * 0.45).toInt(),
-            (pole.display.y * 0.76).toInt(),
-            150, 150,
-            R.drawable.tower,
-            name2 = R.drawable.dedicated_tower,
-            type = mutableStateOf(false)
-        )
-        buildButtonMap[Terrain.TOWER]=b2
-        val b3 = ButtonImage(
-            (pole.display.x * 0.65).toInt(),
-            (pole.display.y * 0.76).toInt(),
-            150, 150,
-            R.drawable.tower_hard,
-            name2 = R.drawable.dedicated_hard_tower,
-            type = mutableStateOf(false)
-        )
-        buildButtonMap[Terrain.HARD_TOWER]=b3
+        buildButtonMap.clear()
+        val buildOrder = listOf(Terrain.FARM, Terrain.TOWER, Terrain.HARD_TOWER)
+        val w = layout.buildCardW()
+        val h = layout.unitCardH()
+        val y = layout.shopCardsY()
+        buildOrder.forEachIndexed { index, terrain ->
+            buildButtonMap[terrain] = ButtonImage(
+                layout.buildCardX(index),
+                y,
+                w,
+                h,
+                hitboxDrawable,
+                name2 = hitboxDrawable,
+                type = mutableStateOf(false)
+            )
+        }
     }
 
     fun initImage(){
@@ -744,8 +722,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                             if (cross.click(mx, my)) {
                                 soundPlayer.play(R.raw.button)
                                 delivereNextHod = false
-                                delivereUnit = false
-                                delivereBuild = false
+                                syncBottomPanel(delivereBuild || delivereUnit)
                             }
                         }
 
@@ -777,6 +754,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                             }
                             if (button_next_hod.click(mx, my)) {
                                 delivereNextHod = true
+                                syncBottomPanel(false)
                                 forceRender()
                             }
 
@@ -789,16 +767,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                             }
                         }
 
-                        if (delivereBuild || delivereUnit || delivereNextHod) {
-                            mini_fon_for_down_game.y = (screenY - screenY * 0.25).toInt()
-                            mini_fon_for_down_game.dy = (screenY * 0.25).toInt()
-                            pole.ogranichenie.max.y = (screenY - screenY * 0.25).toInt()
-                        } else {
-                            mini_fon_for_down_game.y = (screenY - screenY * 0.1).toInt()
-                            mini_fon_for_down_game.dy = (screenY * 0.1).toInt()
-                            pole.ogranichenie.max.y =
-                                pole.ogranichenie.min.y + (pole.mass[0].size) * pole.minDx + pole.minDx / 2
-                        }
+                        syncBottomPanel(delivereBuild || delivereUnit)
                     }
                     else {
                         // Меню паузы
@@ -844,295 +813,204 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
     }
     @Composable
-    fun victoryRender(textMeasurer: TextMeasurer){
-        val listPLayersHadCells = getListPlayersHadCells()
-
-        // Воспроизводим звук победы только один раз
+    fun victoryRender(winnerPlayer: Int) {
         if (isSoundVictory) {
             soundPlayer.play(R.raw.victory, loop = false, volume = 1.0f)
             isSoundVictory = false
         }
-
-        Image(
-            painter = painterResource(id = R.drawable.background_win),
-            contentDescription = "фон",
-            contentScale = ContentScale.Companion.FillBounds,
-            modifier = Modifier.Companion.fillMaxSize()
-        )
-
-        mini_fon_for_win.Render()
-        exit_win.Render()
-        val winnerPlayer = listPLayersHadCells[0]
 
         val imageBitmaps = remember {
             pole.image_mass.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
             }
         }
+        val hexSize = (layout.winCardW * 0.22).toInt()
 
-        Canvas(
-            modifier = Modifier.Companion
-                .fillMaxSize()
-        ) {
-            TextRender(
-                textMeasurer,
-                "Конец игры",
-                (pole.display.x * 0.5).toInt(),
-                (pole.display.y * 0.18).toInt(),
-                40,
-                true,
-                center = true
-            )
-            TextRender(
-                textMeasurer,
-                "Победитель",
-                (pole.display.x * 0.5).toInt(),
-                (pole.display.y * 0.25).toInt(),
-                35,
-                center = true
-            )
-            TextRender(
-                textMeasurer,
-                listPlayers[winnerPlayer].name,
-                (pole.display.x * 0.5).toInt(),
-                (pole.display.y * 0.31).toInt(),
-                30,
-                center = true
-
-            )
-            drawImage(
-                image = imageBitmaps[listPlayers[winnerPlayer].color],
-                dstOffset = IntOffset(
-                    (pole.display.x * 0.7).toInt(),
-                    (pole.display.y * 0.31).toInt()
-                ),
-                dstSize = IntSize(pole.dx, pole.dx)
-            )
-        }
+        hudRender.VictoryOverlay(
+            layout = layout,
+            winnerName = listPlayers[winnerPlayer].name,
+            playerColorBitmap = imageBitmaps[listPlayers[winnerPlayer].color],
+            hexSize = hexSize,
+            exitX = exit_win.x,
+            exitY = exit_win.y,
+            exitW = exit_win.dx,
+            exitH = exit_win.dy
+        )
     }
 
     @Composable
     override fun render() {
-        val currentRenderTrigger = remember { renderTrigger }
+        val trigger = renderTrigger
         val listPLayersHadCells = getListPlayersHadCells()
-        val textMeasurer = rememberTextMeasurer()
+        val isWin = listPLayersHadCells.size == 1
 
-        val transparentHexagonBitmap = ImageBitmap.Companion.imageResource(id = R.drawable.transparent_hexagon)
-        // win
-        if (listPLayersHadCells.size==1){
-            victoryRender(textMeasurer)
-        }
-        else {
+        val transparentHexagonBitmap =
+            ImageBitmap.imageResource(id = R.drawable.transparent_hexagon)
+
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.ocean),
                 contentDescription = "фон",
-                contentScale = ContentScale.Companion.FillBounds,
-                modifier = Modifier.Companion.fillMaxSize()
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.fillMaxSize()
             )
 
             pole.Render()
 
-            if (delivereUnit || delivereBuild && !delivereNextHod) {
-                Canvas(modifier = Modifier.Companion.fillMaxSize()) {
+            if (!isWin && (delivereUnit || delivereBuild) && !delivereNextHod) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
                     RenderConstructionCells(transparentHexagonBitmap)
                 }
             }
 
-            // Отображаем текущего игрока
             for (i in listPlayers.indices) {
-                var renderPlayerIndicator = false
-                if (i == hod_player) {
-                    renderPlayerIndicator = true
-                }
-                listPlayers[i].Render(renderPlayerIndicator)
+                listPlayers[i].Render(i == hod_player)
             }
 
-            mini_fon_for_up_game.Render()
-            leo_koin.Render()
+            if (!isWin) {
+                val shopOpen = (delivereUnit || delivereBuild) && !delivereNextHod
+                val player = listPlayers[hod_player]
+                val netIncome = player.income - player.sale
 
-            Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                TextRender(
-                    textMeasurer,
-                    name = listPlayers[hod_player].name,
-                    x = (screenX * 0.5).toInt(),
-                    y = (screenY * 0.06).toInt(),
-                    size = 25,
-                    bold = true,
-                    center = true
+                hudRender.TopBar(layout)
+                hudRender.TopBarContent(
+                    layout,
+                    player.kazna,
+                    player.name,
+                    netIncome
                 )
-
-                TextRender(
-                    textMeasurer,
-                    name = listPlayers[hod_player].kazna.toString(),
-                    x = (screenX * 0.15).toInt(),
-                    y = (screenY * 0.06).toInt(),
-                    size = 25,
-                    bold = true
+                hudRender.HamburgerButton(
+                    layout.hamburgerX,
+                    layout.hamburgerY,
+                    layout.hamburgerSize
                 )
+                hudRender.BottomParchmentPanel(layout, shopOpen)
 
-                var textIncome = "+"
-                if (listPlayers[hod_player].income - listPlayers[hod_player].sale < 0) {
-                    textIncome = ""
-                }
-                TextRender(
-                    textMeasurer,
-                    name = "$textIncome${listPlayers[hod_player].income - listPlayers[hod_player].sale}",
-                    x = (screenX * 0.8).toInt(),
-                    y = (screenY * 0.06).toInt(),
-                    size = 25,
-                    bold = true,
-                    center = true
-                )
-            }
-
-            mini_fon_for_down_game.Render()
-            button_point_back.Render()
-            button_next_hod.Render()
-            if (delivereNextHod) {
-                check_mark.Render()
-                cross.Render()
-                Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                    TextRender(
-                        textMeasurer,
-                        name = "Вы хотите закончить ход?",
-                        x = (screenX * 0.5).toInt(),
-                        y = (screenY * 0.79).toInt(),
-                        size = 25,
-                        center = true
-                    )
-                }
-            }
-
-            if (delivereUnit && !delivereNextHod) {
-
-                Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                    TextRender(
-                        textMeasurer,
-                        name = "Цена",
-                        x = (screenX * 0.15).toInt(),
-                        y = (screenY * 0.83).toInt(),
-                        size = 25,
-                        center = true
-                    )
-
-                    TextRender(
-                        textMeasurer,
-                        name = "Доход",
-                        x = (screenX * 0.15).toInt(),
-                        y = (screenY * 0.86).toInt(),
-                        size = 25,
-                        center = true
+                val selectedIdx = player.selectedUnit
+                if (
+                    !shopOpen &&
+                    !delivereNextHod &&
+                    selectedIdx != null &&
+                    selectedIdx in player.units.indices
+                ) {
+                    val unit = player.units[selectedIdx]
+                    val unitEco = economic.getValue(unit.type)
+                    hudRender.SelectedUnitChip(
+                        layout = layout,
+                        unitTitle = GameHudRender.unitTitle(unit.type),
+                        unitIconRes = GameHudRender.unitIcon(unit.type),
+                        movement = unit.Movement,
+                        protection = unitEco.protection
                     )
                 }
 
-                for (i in unitButtonsMap) {
-                    i.value.Render()
-                    val economicBuild = economic.getValue(i.key)
-                    Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                        TextRender(
-                            textMeasurer,
-                            name = "${economicBuild.price}",
-                            x = i.value.x + i.value.dx / 2,
-                            y = (i.value.y + i.value.dx).toInt(),
-                            size = 25,
-                            center = true
-                        )
-
-                        TextRender(
-                            textMeasurer,
-                            name = "${(economicBuild.income - economicBuild.sale)}",
-                            x = i.value.x + i.value.dx / 2,
-                            y = (screenY * 0.86).toInt(),
-                            size = 25,
-                            center = true
+                if (delivereUnit && !delivereNextHod) {
+                    hudRender.ShopUnitHeader(layout)
+                    for ((terrain, btn) in unitButtonsMap) {
+                        val eco = economic.getValue(terrain)
+                        hudRender.UnitShopCard(
+                            btn.x,
+                            btn.y,
+                            btn.dx,
+                            btn.dy,
+                            GameHudRender.unitTitle(terrain),
+                            GameHudRender.unitIcon(terrain),
+                            eco,
+                            btn.type.value
                         )
                     }
                 }
-            }
 
-            if (delivereBuild && !delivereNextHod) {
-                Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                    TextRender(
-                        textMeasurer,
-                        name = "Цена",
-                        x = (screenX * 0.15).toInt(),
-                        y = (screenY * 0.83).toInt(),
-                        size = 25,
-                        center = true
-                    )
-
-                    TextRender(
-                        textMeasurer,
-                        name = "Доход",
-                        x = (screenX * 0.15).toInt(),
-                        y = (screenY * 0.86).toInt(),
-                        size = 25,
-                        center = true
-                    )
-                }
-                for (i in buildButtonMap) {
-                    i.value.Render()
-                    val economicBuild = economic.getValue(i.key)
-                    Canvas(modifier = Modifier.Companion.fillMaxSize()) {
-                        TextRender(
-                            textMeasurer,
-                            name = "${economicBuild.price}",
-                            x = i.value.x + i.value.dx / 2,
-                            y = (i.value.y + i.value.dx).toInt(),
-                            size = 25,
-                            center = true
-                        )
-
-                        TextRender(
-                            textMeasurer,
-                            name = "${(economicBuild.income - economicBuild.sale)}",
-                            x = i.value.x + i.value.dx / 2,
-                            y = (screenY * 0.86).toInt(),
-                            size = 25,
-                            center = true
+                if (delivereBuild && !delivereNextHod) {
+                    hudRender.ShopUnitHeader(layout)
+                    for ((terrain, btn) in buildButtonMap) {
+                        val eco = economic.getValue(terrain)
+                        val farmLine = if (terrain == Terrain.FARM) "+20 за каждую" else null
+                        hudRender.BuildShopCard(
+                            btn.x,
+                            btn.y,
+                            btn.dx,
+                            btn.dy,
+                            GameHudRender.buildTitle(terrain),
+                            GameHudRender.buildIcon(terrain),
+                            eco,
+                            farmLine,
+                            btn.type.value
                         )
                     }
                 }
-            }
 
-            // Отображаем кнопки выбора зданий и юнитов
-            buildSettings.Render()
-            unitSettings.Render()
-        }
+                hudRender.TabButton(
+                    buildSettings.x,
+                    buildSettings.y,
+                    buildSettings.dx,
+                    buildSettings.dy,
+                    "Здания",
+                    R.drawable.rules_build_farm,
+                    delivereBuild
+                )
+                hudRender.TabButton(
+                    unitSettings.x,
+                    unitSettings.y,
+                    unitSettings.dx,
+                    unitSettings.dy,
+                    "Юниты",
+                    R.drawable.rules_unit_skeleton,
+                    delivereUnit
+                )
+                hudRender.EndTurnButton(
+                    button_next_hod.x,
+                    button_next_hod.y,
+                    button_next_hod.dx,
+                    button_next_hod.dy
+                )
 
-        if (isPauseMenu){
-            backGround_for_pause_menu.Render(alpha = 0.7f)
-            mini_fon_for_pause_menu.Render(alpha = 1f)
-
-            buttonDownload.Render()
-            buttonSave.Render()
-
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                if (isSaved!=null) {
-                    TextRender(
-                        textMeasurer,
-                        name = if (isSaved!!) "Игра успешна сохранена" else "не получилось сохранить игру",
-                        x = screenX / 2,
-                        y = (screenY * 0.25).toInt(),
-                        color = Color.White,
-                        center = true
-                    )
-                }else if (isDownload!=null){
-                    TextRender(
-                        textMeasurer,
-                        name = if (isDownload!!) "Игра успешна загружена" else "не получилось загрузить игру",
-                        x = screenX / 2,
-                        y = (screenY * 0.25).toInt(),
-                        color = Color.White,
-                        center = true
+                if (delivereNextHod && !isPauseMenu) {
+                    hudRender.EndTurnModal(
+                        layout,
+                        check_mark.x,
+                        check_mark.y,
+                        check_mark.dx,
+                        check_mark.dy,
+                        cross.x,
+                        cross.y,
+                        cross.dx,
+                        cross.dy
                     )
                 }
             }
 
-            button_return_in_game.Render()
-            button_setting.Render()
-            button_is_look_rupes.Render()
-            button_return_in_menu.Render()
+            if (isWin) {
+                victoryRender(listPLayersHadCells[0])
+            }
+
+            if (isPauseMenu && !isWin) {
+                val status = when {
+                    isSaved == true -> "✓ Игра успешно сохранена"
+                    isSaved == false -> "не получилось сохранить игру"
+                    isDownload == true -> "✓ Игра успешно загружена"
+                    isDownload == false -> "не получилось загрузить игру"
+                    else -> null
+                }
+                hudRender.PauseMenu(
+                    layout = layout,
+                    saveX = buttonSave.x,
+                    saveY = buttonSave.y,
+                    saveW = buttonSave.dx,
+                    saveH = buttonSave.dy,
+                    loadX = buttonDownload.x,
+                    loadY = buttonDownload.y,
+                    loadW = buttonDownload.dx,
+                    loadH = buttonDownload.dy,
+                    menuButtons = listOf(
+                        "Вернуться в игру" to button_return_in_game,
+                        "Настройки" to button_setting,
+                        "Правила" to button_is_look_rupes,
+                        "В меню" to button_return_in_menu
+                    ),
+                    statusMessage = status
+                )
+            }
         }
     }
 
@@ -1199,9 +1077,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
         listPlayers[hod_player].selectedUnit=null
 
-        mini_fon_for_down_game.y=(screenY-screenY*0.1).toInt()
-        mini_fon_for_down_game.dy=(screenY*0.1).toInt()
-        pole.ogranichenie.max.y=pole.ogranichenie.min.y+(pole.mass[0].size)*pole.minDx+pole.minDx/2
+        syncBottomPanel(false)
 
         // Сбрасываем выделение кнопок
         for (i in unitButtonsMap) {
@@ -1251,6 +1127,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
         // Сбрасываем настройки игроков и поля
         pole = Pole(context = context)
         createPLayers()
+        applyHudHitboxes()
 
         for (player in listPlayers){
             player.kazna=30

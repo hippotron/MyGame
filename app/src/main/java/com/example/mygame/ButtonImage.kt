@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.IntSize
 class ButtonImage(
     var x: Int,
     var y: Int,
-    val dx: Int,
+    var dx: Int,
     var dy: Int,
     val name: Int,
     val name2: Int = name,
