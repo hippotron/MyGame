@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.mygame.ButtonImage
 import com.example.mygame.Economic
+import com.example.mygame.PackageForKoor.ScreenRel
 import com.example.mygame.PictureRender
 import com.example.mygame.R
 import com.example.mygame.Scene.ForScene.GameEngine
@@ -60,6 +61,7 @@ class RulesScene(
     private val soundPlayer = SoundPlayer(context)
 
     private val PicRender = PictureRender()
+    private val ScRel = ScreenRel(context)
 
     override fun update() {}
 
@@ -161,8 +163,8 @@ class RulesScene(
     @Composable
     fun RenderStart() {
         RenderFactCard(45.dp, 240.dp, R.drawable.rules_icon_coin_crown, "80 монет")
-        RenderFactCard(166.dp, 240.dp, R.drawable.rules_icon_hexes, "7 клеток")
-        RenderFactCard(280.dp, 240.dp, R.drawable.rules_icon_income, "+50 доход")
+        RenderFactCard(155.dp, 240.dp, R.drawable.rules_icon_hexes, "7 клеток")
+        RenderFactCard(265.dp, 240.dp, R.drawable.rules_icon_income, "+50 доход")
         RenderIncomeCard()
     }
 
@@ -171,7 +173,7 @@ class RulesScene(
         Box(
             modifier = Modifier
                 .offset(x = koorX, y = koorY)
-                .size(width = 110.dp, height = 114.dp)
+                .size(width = 105.dp, height = 110.dp)
                 .parchmentCard()
         ) {
             PicRender.RenderImage(icon, ((110.dp)/2-(74.dp)/2), 8.dp, 74.dp)
@@ -184,22 +186,22 @@ class RulesScene(
         Box(
             modifier = Modifier
                 .offset(x = 45.dp, y = 368.dp)
-                .size(width = 345.dp, height = 150.dp)
+                .size(width = 325.dp, height = 150.dp)
                 .parchmentCard()
         ) {
             PicRender.RenderImage(R.drawable.rules_icon_leaf_hex, 10.dp, 8.dp, 85.dp)
-            PicRender.RenderText("Доход", 105.dp, 8.dp, 26, color = Color(0xFF3B2412))
-            PicRender.RenderText("Клетка даёт +10 монет \nза ход ", 105.dp, 38.dp, 21, bold = false)
-            PicRender.RenderText("(Юниты и здания \nденьги не приносят)", 10.dp, 90.dp, 21, bold = false, center = true)
+            PicRender.RenderText("Доход", /*105.dp*/, 8.dp, 26, color = Color(0xFF3B2412))
+            PicRender.RenderText("Клетка даёт +10 \nмонет за ход ", 105.dp, 38.dp, 21, bold = false)
+            PicRender.RenderText("(Юниты и здания деньги \nне приносят)", 10.dp, 95.dp, 21, bold = false, center = true)
         }
     }
 
     @Composable
     fun RenderBuildings() {
         RenderBuildCard(45.dp, "Ферма", R.drawable.rules_build_farm, "200", "Доход", "+30", R.drawable.rules_stat_bag, Color(0xFF2F6B32), "0")
-        RenderBuildCard(166.dp, "Башня", R.drawable.rules_build_tower, "120", "За ход", "-50", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "2")
-        RenderBuildCard(280.dp, "Усиленная\nбашня", R.drawable.rules_build_hard_tower, "350", "За ход", "-200", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "3")
-        RenderRuleCard(468.dp, 80.dp, R.drawable.rules_stat_coin, "Цена фермы", "200 + 20 × n\nn — число уже построенных ферм.", 40.dp)
+        RenderBuildCard(155.dp, "Башня", R.drawable.rules_build_tower, "120", "За ход", "-50", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "2")
+        RenderBuildCard(270.dp, "Усиленная\nбашня", R.drawable.rules_build_hard_tower, "350", "За ход", "-200", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "3")
+        RenderRuleCard(470.dp, 80.dp, R.drawable.rules_stat_coin, "Цена фермы", "200 + 20 × n\nn — число уже построенных ферм.", 40.dp)
     }
 
     @Composable
@@ -217,7 +219,7 @@ class RulesScene(
         Box(
             modifier = Modifier
                 .offset(x = koorX, y = 240.dp)
-                .size(width = 110.dp, height = 220.dp)
+                .size(width = 105.dp, height = 220.dp)
                 .parchmentCard()
         ) {
             PicRender.RenderImage(image, 19.dp, 4.dp, 72.dp)
@@ -264,7 +266,7 @@ class RulesScene(
         Box(
             modifier = Modifier
                 .offset(x = 45.dp, y = y)
-                .size(width = 345.dp, height = height)
+                .size(width = 330.dp, height = height)
                 .parchmentCard()
         ) {
             PicRender.RenderImage(icon, 8.dp, 8.dp, 28.dp)
