@@ -120,51 +120,51 @@ class RulesScene(
     fun RenderHeader(slide: Int) {
         RenderFull(R.drawable.background_menu)
         RenderFull(R.drawable.rules_parchment)
-        PicRender.RenderImage(R.drawable.rules_fleur, 204.dp, 110.dp, 28.dp)
-        PicRender.RenderText("Правила", 0.dp, 145.dp, 44, color = Color(0xFF3B2412), center = true)
+        PicRender.RenderImage(R.drawable.rules_fleur, ScRel.x(49.58f), ScRel.y(11.91f), ScRel.x(6.81f))
+        PicRender.RenderText("Правила", ScRel.x(0f), ScRel.y(15.70f), ScRel.font(4.77f), color = Color(0xFF3B2412), center = true)
         val title = when (slide) {
             1 -> "Начало игры"
             2 -> "Юниты"
             3 -> "Здания"
             else -> "Бой и ход"
         }
-        PicRender.RenderText(title, 0.dp, 195.dp, 26, color = Color(0xFF6B4A2A), center = true)
+        PicRender.RenderText(title, ScRel.x(0f), ScRel.y(21.12f), ScRel.font(2.82f), color = Color(0xFF6B4A2A), center = true)
     }
 
     @Composable
     fun RenderUnits(){
         RenderSkeleton(
-            45.dp,
-            240.dp,
-            165.dp,
-            250.dp
+            ScRel.x(10.94f),
+            ScRel.y(25.99f),
+            ScRel.x(40.10f),
+            ScRel.y(27.07f)
         )
         RenderBarbarian(
-            215.dp,
-            240.dp,
-            165.dp,
-            250.dp
+            ScRel.x(52.26f),
+            ScRel.y(25.99f),
+            ScRel.x(40.10f),
+            ScRel.y(27.07f)
         )
         RenderKnight(
-            45.dp,
-            493.dp,
-            165.dp,
-            250.dp
+            ScRel.x(10.94f),
+            ScRel.y(53.39f),
+            ScRel.x(40.10f),
+            ScRel.y(27.07f)
         )
         RenderPaladin(
-            215.dp,
-            493.dp,
-            165.dp,
-            250.dp
+            ScRel.x(52.26f),
+            ScRel.y(53.39f),
+            ScRel.x(40.10f),
+            ScRel.y(27.07f)
         )
         RenderTextPaladin()
     }
 
     @Composable
     fun RenderStart() {
-        RenderFactCard(45.dp, 240.dp, R.drawable.rules_icon_coin_crown, "80 монет")
-        RenderFactCard(155.dp, 240.dp, R.drawable.rules_icon_hexes, "7 клеток")
-        RenderFactCard(265.dp, 240.dp, R.drawable.rules_icon_income, "+50 доход")
+        RenderFactCard(ScRel.x(10.94f), ScRel.y(25.99f), R.drawable.rules_icon_coin_crown, "80 монет")
+        RenderFactCard(ScRel.x(37.67f), ScRel.y(25.99f), R.drawable.rules_icon_hexes, "7 клеток")
+        RenderFactCard(ScRel.x(64.41f), ScRel.y(25.99f), R.drawable.rules_icon_income, "+50 доход")
         RenderIncomeCard()
     }
 
@@ -173,11 +173,11 @@ class RulesScene(
         Box(
             modifier = Modifier
                 .offset(x = koorX, y = koorY)
-                .size(width = 105.dp, height = 110.dp)
+                .size(width = ScRel.x(25.52f), height = ScRel.y(11.91f))
                 .parchmentCard()
         ) {
-            PicRender.RenderImage(icon, ((110.dp)/2-(74.dp)/2), 8.dp, 74.dp)
-            PicRender.RenderText(label, 0.dp, 85.dp, 20, color = Color(0xFF3B2412), center = true)
+            PicRender.RenderImage(icon, ScRel.x(4.38f), ScRel.y(0.87f), ScRel.x(17.99f))
+            PicRender.RenderText(label, ScRel.x(0f), ScRel.y(9.21f), ScRel.font(2.17f), color = Color(0xFF3B2412), center = true)
         }
     }
 
@@ -185,23 +185,23 @@ class RulesScene(
     private fun RenderIncomeCard() {
         Box(
             modifier = Modifier
-                .offset(x = 45.dp, y = 368.dp)
-                .size(width = 325.dp, height = 150.dp)
+                .offset(x = ScRel.x(10.94f), y = ScRel.y(39.85f))
+                .size(width = ScRel.x(78.99f), height = ScRel.y(16.24f))
                 .parchmentCard()
         ) {
-            PicRender.RenderImage(R.drawable.rules_icon_leaf_hex, 10.dp, 8.dp, 85.dp)
-            PicRender.RenderText("Доход", /*105.dp*/, 8.dp, 26, color = Color(0xFF3B2412))
-            PicRender.RenderText("Клетка даёт +10 \nмонет за ход ", 105.dp, 38.dp, 21, bold = false)
-            PicRender.RenderText("(Юниты и здания деньги \nне приносят)", 10.dp, 95.dp, 21, bold = false, center = true)
+            PicRender.RenderImage(R.drawable.rules_icon_leaf_hex, ScRel.x(2.43f), ScRel.y(0.87f), ScRel.x(20.66f))
+            PicRender.RenderText("Доход", ScRel.x(25.52f), ScRel.y(0.87f), ScRel.font(2.82f), color = Color(0xFF3B2412))
+            PicRender.RenderText("Клетка даёт +10 \nмонет за ход ", ScRel.x(25.52f), ScRel.y(4.12f), ScRel.font(2.27f), bold = false)
+            PicRender.RenderText("(Юниты и здания деньги \nне приносят)", ScRel.x(2.43f), ScRel.y(10.29f), ScRel.font(2.27f), bold = false, center = true)
         }
     }
 
     @Composable
     fun RenderBuildings() {
-        RenderBuildCard(45.dp, "Ферма", R.drawable.rules_build_farm, "200", "Доход", "+30", R.drawable.rules_stat_bag, Color(0xFF2F6B32), "0")
-        RenderBuildCard(155.dp, "Башня", R.drawable.rules_build_tower, "120", "За ход", "-50", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "2")
-        RenderBuildCard(270.dp, "Усиленная\nбашня", R.drawable.rules_build_hard_tower, "350", "За ход", "-200", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "3")
-        RenderRuleCard(470.dp, 80.dp, R.drawable.rules_stat_coin, "Цена фермы", "200 + 20 × n\nn — число уже построенных ферм.", 40.dp)
+        RenderBuildCard(ScRel.x(10.94f), "Ферма", R.drawable.rules_build_farm, "200", "Доход", "+30", R.drawable.rules_stat_bag, Color(0xFF2F6B32), "0")
+        RenderBuildCard(ScRel.x(37.67f), "Башня", R.drawable.rules_build_tower, "120", "За ход", "-50", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "2")
+        RenderBuildCard(ScRel.x(65.63f), "Усиленная\nбашня", R.drawable.rules_build_hard_tower, "350", "За ход", "-200", R.drawable.rules_stat_boot, Color(0xFF9B2C2C), "3")
+        RenderRuleCard(ScRel.y(50.90f), ScRel.y(8.66f), R.drawable.rules_stat_coin, "Цена фермы", "200 + 20 × n\nn — число уже построенных ферм.", ScRel.y(4.33f))
     }
 
     @Composable
@@ -218,39 +218,39 @@ class RulesScene(
     ) {
         Box(
             modifier = Modifier
-                .offset(x = koorX, y = 240.dp)
-                .size(width = 105.dp, height = 220.dp)
+                .offset(x = koorX, y = ScRel.y(25.99f))
+                .size(width = ScRel.x(25.52f), height = ScRel.y(23.82f))
                 .parchmentCard()
         ) {
-            PicRender.RenderImage(image, 19.dp, 4.dp, 72.dp)
-            PicRender.RenderText(title, 0.dp, 78.dp, 16, color = Color(0xFF3B2412), center = true)
+            PicRender.RenderImage(image, ScRel.x(4.62f), ScRel.y(0.43f), ScRel.x(17.50f))
+            PicRender.RenderText(title, ScRel.x(0f), ScRel.y(8.45f), ScRel.font(1.73f), color = Color(0xFF3B2412), center = true)
 
-            PicRender.RenderImage(R.drawable.rules_stat_coin, 4.dp, 122.dp, 18.dp)
-            PicRender.RenderText("Цена", 24.dp, 122.dp, 14)
-            PicRender.RenderText(price, 72.dp, 122.dp, 14, color = Color(0xFF3B2412))
+            PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(0.97f), ScRel.y(13.21f), ScRel.x(4.38f))
+            PicRender.RenderText("Цена", ScRel.x(5.83f), ScRel.y(13.21f), ScRel.font(1.52f))
+            PicRender.RenderText(price, ScRel.x(17.50f), ScRel.y(13.21f), ScRel.font(1.52f), color = Color(0xFF3B2412))
 
-            PicRender.RenderImage(turnIcon, 4.dp, 148.dp, 18.dp)
-            PicRender.RenderText(turnLabel, 24.dp, 148.dp, 14)
-            PicRender.RenderText(turn, 68.dp, 148.dp, 14, color = turnColor)
+            PicRender.RenderImage(turnIcon, ScRel.x(0.97f), ScRel.y(16.03f), ScRel.x(4.38f))
+            PicRender.RenderText(turnLabel, ScRel.x(5.83f), ScRel.y(16.03f), ScRel.font(1.52f))
+            PicRender.RenderText(turn, ScRel.x(16.53f), ScRel.y(16.03f), ScRel.font(1.52f), color = turnColor)
 
-            PicRender.RenderImage(R.drawable.rules_stat_shield, 4.dp, 174.dp, 18.dp)
-            PicRender.RenderText("Защита", 24.dp, 174.dp, 14)
-            PicRender.RenderText(defense, 80.dp, 174.dp, 14, color = Color(0xFF3B2412))
+            PicRender.RenderImage(R.drawable.rules_stat_shield, ScRel.x(0.97f), ScRel.y(18.84f), ScRel.x(4.38f))
+            PicRender.RenderText("Защита", ScRel.x(5.83f), ScRel.y(18.84f), ScRel.font(1.52f))
+            PicRender.RenderText(defense, ScRel.x(19.44f), ScRel.y(18.84f), ScRel.font(1.52f), color = Color(0xFF3B2412))
         }
     }
 
     @Composable
     fun RenderBattle() {
         RenderRuleCard(
-            240.dp, 168.dp, R.drawable.rules_stat_shield, "Защита территории",
-            "Клетки вокруг юнита или башни\nполучают их защиту.", 124.dp
+            ScRel.y(25.99f), ScRel.y(18.19f), R.drawable.rules_stat_shield, "Защита территории",
+            "Клетки вокруг юнита или башни\nполучают их защиту.", ScRel.y(13.43f)
         ) { RenderProtectHexes() }
         RenderRuleCard(
-            416.dp, 168.dp, R.drawable.rules_stat_boot, "Ход юнита",
-            "Сначала юнит ходит на соседнюю клетку,\nзатем с неё — на следующую соседнюю.", 124.dp
+            ScRel.y(45.05f), ScRel.y(18.19f), R.drawable.rules_stat_boot, "Ход юнита",
+            "Сначала юнит ходит на соседнюю клетку,\nзатем с неё — на следующую соседнюю.", ScRel.y(13.43f)
         ) { RenderMoveSteps() }
-        RenderRuleCard(592.dp, 90.dp, R.drawable.rules_icon_star, "Захват", "Ступив на клетку, юнит присваивает её игроку.", 42.dp)
-        RenderRuleCard(690.dp, 90.dp, R.drawable.rules_stat_bag, "Начало хода", "Доход идёт в казну. Юниты снова могут ходить.", 42.dp)
+        RenderRuleCard(ScRel.y(64.11f), ScRel.y(9.75f), R.drawable.rules_icon_star, "Захват", "Ступив на клетку, юнит присваивает её игроку.", ScRel.y(4.55f))
+        RenderRuleCard(ScRel.y(74.72f), ScRel.y(9.75f), R.drawable.rules_stat_bag, "Начало хода", "Доход идёт в казну. Юниты снова могут ходить.", ScRel.y(4.55f))
     }
 
     @Composable
@@ -265,58 +265,58 @@ class RulesScene(
     ) {
         Box(
             modifier = Modifier
-                .offset(x = 45.dp, y = y)
-                .size(width = 330.dp, height = height)
+                .offset(x = ScRel.x(10.94f), y = y)
+                .size(width = ScRel.x(80.21f), height = height)
                 .parchmentCard()
         ) {
-            PicRender.RenderImage(icon, 8.dp, 8.dp, 28.dp)
-            PicRender.RenderText(title, 42.dp, 8.dp, 20, color = Color(0xFF3B2412))
+            PicRender.RenderImage(icon, ScRel.x(1.94f), ScRel.y(0.87f), ScRel.x(6.81f))
+            PicRender.RenderText(title, ScRel.x(10.21f), ScRel.y(0.87f), ScRel.font(2.17f), color = Color(0xFF3B2412))
             diagram()
-            PicRender.RenderText(text, 8.dp, textY, 16, bold = false)
+            PicRender.RenderText(text, ScRel.x(1.94f), textY, ScRel.font(1.73f), bold = false)
         }
     }
 
     @Composable
     private fun RenderProtectHexes() {
-        RenderHex(158.dp, 34.dp, true)
-        RenderHex(132.dp, 48.dp, true)
-        RenderHex(184.dp, 48.dp, true)
-        RenderHex(158.dp, 62.dp, false)
-        RenderHex(132.dp, 76.dp, true)
-        RenderHex(184.dp, 76.dp, true)
-        RenderHex(158.dp, 90.dp, true)
-        PicRender.RenderImage(R.drawable.tower, 164.dp, 68.dp, 18.dp)
+        RenderHex(ScRel.x(38.40f), ScRel.y(3.68f), true)
+        RenderHex(ScRel.x(32.08f), ScRel.y(5.20f), true)
+        RenderHex(ScRel.x(44.72f), ScRel.y(5.20f), true)
+        RenderHex(ScRel.x(38.40f), ScRel.y(6.71f), false)
+        RenderHex(ScRel.x(32.08f), ScRel.y(8.23f), true)
+        RenderHex(ScRel.x(44.72f), ScRel.y(8.23f), true)
+        RenderHex(ScRel.x(38.40f), ScRel.y(9.75f), true)
+        PicRender.RenderImage(R.drawable.tower, ScRel.x(39.86f), ScRel.y(7.36f), ScRel.x(4.38f))
     }
 
     @Composable
     private fun RenderHex(x: Dp, y: Dp, mark: Boolean) {
-        PicRender.RenderImage(R.drawable.two, x, y, 28.dp)
-        if (mark) PicRender.RenderText("2", x + 8.dp, y + 4.dp, 12, color = Color(0xFF3B2412))
+        PicRender.RenderImage(R.drawable.two, x, y, ScRel.x(6.81f))
+        if (mark) PicRender.RenderText("2", x + ScRel.x(1.94f), y + ScRel.y(0.43f), ScRel.font(1.30f), color = Color(0xFF3B2412))
     }
 
     @Composable
     private fun RenderMoveSteps() {
-        PicRender.RenderImage(R.drawable.two, 16.dp, 52.dp, 48.dp)
-        PicRender.RenderImage(R.drawable.skeleton, 22.dp, 58.dp, 36.dp)
-        PicRender.RenderText("1", 74.dp, 48.dp, 14, color = Color(0xFF3B2412))
-        PicRender.RenderImage(R.drawable.arrow_right, 70.dp, 68.dp, 22.dp)
-        PicRender.RenderImage(R.drawable.two, 108.dp, 52.dp, 48.dp)
-        PicRender.RenderText("2", 166.dp, 48.dp, 14, color = Color(0xFF3B2412))
-        PicRender.RenderImage(R.drawable.arrow_right, 162.dp, 68.dp, 22.dp)
-        PicRender.RenderImage(R.drawable.two, 200.dp, 52.dp, 48.dp)
+        PicRender.RenderImage(R.drawable.two, ScRel.x(3.89f), ScRel.y(5.63f), ScRel.x(11.67f))
+        PicRender.RenderImage(R.drawable.skeleton, ScRel.x(5.35f), ScRel.y(6.28f), ScRel.x(8.75f))
+        PicRender.RenderText("1", ScRel.x(17.99f), ScRel.y(5.20f), ScRel.font(1.52f), color = Color(0xFF3B2412))
+        PicRender.RenderImage(R.drawable.arrow_right, ScRel.x(17.01f), ScRel.y(7.36f), ScRel.x(5.35f))
+        PicRender.RenderImage(R.drawable.two, ScRel.x(26.25f), ScRel.y(5.63f), ScRel.x(11.67f))
+        PicRender.RenderText("2", ScRel.x(40.35f), ScRel.y(5.20f), ScRel.font(1.52f), color = Color(0xFF3B2412))
+        PicRender.RenderImage(R.drawable.arrow_right, ScRel.x(39.38f), ScRel.y(7.36f), ScRel.x(5.35f))
+        PicRender.RenderImage(R.drawable.two, ScRel.x(48.61f), ScRel.y(5.63f), ScRel.x(11.67f))
     }
 
     @Composable
     private fun RenderTextPaladin() {
         Box(
             modifier = Modifier
-                .offset(x = 45.dp, y = 750.dp)
+                .offset(x = ScRel.x(10.94f), y = ScRel.y(81.22f))
 
-                .size(width = 340.dp, height = 55.dp)
+                .size(width = ScRel.x(82.64f), height = ScRel.y(5.96f))
                 .parchmentCard()
         ){
-            PicRender.RenderImage(R.drawable.rules_stat_boot, 5.dp, 2.dp, 45.dp)
-            PicRender.RenderText("Паладин может ходить на \n клетку с любой защитой", 50.dp, 2.dp,20)
+            PicRender.RenderImage(R.drawable.rules_stat_boot, ScRel.x(1.22f), ScRel.y(0.22f), ScRel.x(10.94f))
+            PicRender.RenderText("Паладин может ходить на \n клетку с любой защитой", ScRel.x(12.15f), ScRel.y(0.22f), ScRel.font(2.17f))
         }
     }
 
@@ -330,23 +330,23 @@ class RulesScene(
 
         ) {
             // скелет
-            PicRender.RenderImage(R.drawable.rules_unit_skeleton, 23.dp, 3.dp, 119.dp)
-            PicRender.RenderText("Скелет", 37.dp, 123.dp, 26, color = Color(0xFF3B2412))   // color 0xFF6B4A2A
+            PicRender.RenderImage(R.drawable.rules_unit_skeleton, ScRel.x(5.59f), ScRel.y(0.32f), ScRel.x(28.92f))
+            PicRender.RenderText("Скелет", ScRel.x(8.99f), ScRel.y(13.32f), ScRel.font(2.82f), color = Color(0xFF3B2412))   // color 0xFF6B4A2A
 
             // цена
-            PicRender.RenderImage(R.drawable.rules_stat_coin, 5.dp, 156.dp, 29.dp)
-            PicRender.RenderText("Цена", 37.dp, 156.dp, 20)   // color 0xFF6B4A2A
-            PicRender.RenderText("80", 136.dp, 156.dp, 20)    // color 0xFF3B2412
+            PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(1.22f), ScRel.y(16.89f), ScRel.x(7.05f))
+            PicRender.RenderText("Цена", ScRel.x(8.99f), ScRel.y(16.89f), ScRel.font(2.17f))   // color 0xFF6B4A2A
+            PicRender.RenderText("80", ScRel.x(33.06f), ScRel.y(16.89f), ScRel.font(2.17f))    // color 0xFF3B2412
 
             // за ход
-            PicRender.RenderImage(R.drawable.rules_stat_boot, 5.dp, 186.dp, 29.dp)
-            PicRender.RenderText("За ход", 37.dp, 186.dp, 20) // color 0xFF6B4A2A
-            PicRender.RenderText("-20", 129.dp, 186.dp, 20, color = Color(0xFF9B2C2C))   // color 0xFF9B2C2C
+            PicRender.RenderImage(R.drawable.rules_stat_boot, ScRel.x(1.22f), ScRel.y(20.14f), ScRel.x(7.05f))
+            PicRender.RenderText("За ход", ScRel.x(8.99f), ScRel.y(20.14f), ScRel.font(2.17f)) // color 0xFF6B4A2A
+            PicRender.RenderText("-20", ScRel.x(31.35f), ScRel.y(20.14f), ScRel.font(2.17f), color = Color(0xFF9B2C2C))   // color 0xFF9B2C2C
 
             // защита
-            PicRender.RenderImage(R.drawable.rules_stat_shield, 5.dp, 216.dp, 29.dp)
-            PicRender.RenderText("Защита", 37.dp, 216.dp, 20) // color 0xFF6B4A2A
-            PicRender.RenderText("1", 148.dp, 216.dp, 20)     // color 0xFF3B2412
+            PicRender.RenderImage(R.drawable.rules_stat_shield, ScRel.x(1.22f), ScRel.y(23.39f), ScRel.x(7.05f))
+            PicRender.RenderText("Защита", ScRel.x(8.99f), ScRel.y(23.39f), ScRel.font(2.17f)) // color 0xFF6B4A2A
+            PicRender.RenderText("1", ScRel.x(35.97f), ScRel.y(23.39f), ScRel.font(2.17f))     // color 0xFF3B2412
         }
     }
 
@@ -360,23 +360,23 @@ class RulesScene(
 
         ) {
             // варвар
-            PicRender.RenderImage(R.drawable.rules_unit_barbarian, 23.dp, 3.dp, 119.dp)
-            PicRender.RenderText("Варвар", 37.dp, 123.dp, 26, color = Color(0xFF3B2412))
+            PicRender.RenderImage(R.drawable.rules_unit_barbarian, ScRel.x(5.59f), ScRel.y(0.32f), ScRel.x(28.92f))
+            PicRender.RenderText("Варвар", ScRel.x(8.99f), ScRel.y(13.32f), ScRel.font(2.82f), color = Color(0xFF3B2412))
 
             // цена
-            PicRender.RenderImage(R.drawable.rules_stat_coin, 5.dp, 156.dp, 29.dp)
-            PicRender.RenderText("Цена", 37.dp, 156.dp, 20)
-            PicRender.RenderText("220", 129.dp, 156.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(1.22f), ScRel.y(16.89f), ScRel.x(7.05f))
+            PicRender.RenderText("Цена", ScRel.x(8.99f), ScRel.y(16.89f), ScRel.font(2.17f))
+            PicRender.RenderText("220", ScRel.x(31.35f), ScRel.y(16.89f), ScRel.font(2.17f))
 
             // за ход
-            PicRender.RenderImage(R.drawable.rules_stat_boot, 5.dp, 186.dp, 29.dp)
-            PicRender.RenderText("За ход", 37.dp, 186.dp, 20)
-            PicRender.RenderText("-80", 129.dp, 186.dp, 20, color = Color(0xFF9B2C2C))
+            PicRender.RenderImage(R.drawable.rules_stat_boot, ScRel.x(1.22f), ScRel.y(20.14f), ScRel.x(7.05f))
+            PicRender.RenderText("За ход", ScRel.x(8.99f), ScRel.y(20.14f), ScRel.font(2.17f))
+            PicRender.RenderText("-80", ScRel.x(31.35f), ScRel.y(20.14f), ScRel.font(2.17f), color = Color(0xFF9B2C2C))
 
             // защита
-            PicRender.RenderImage(R.drawable.rules_stat_shield, 5.dp, 216.dp, 29.dp)
-            PicRender.RenderText("Защита", 37.dp, 216.dp, 20)
-            PicRender.RenderText("2", 148.dp, 216.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_shield, ScRel.x(1.22f), ScRel.y(23.39f), ScRel.x(7.05f))
+            PicRender.RenderText("Защита", ScRel.x(8.99f), ScRel.y(23.39f), ScRel.font(2.17f))
+            PicRender.RenderText("2", ScRel.x(35.97f), ScRel.y(23.39f), ScRel.font(2.17f))
         }
     }
 
@@ -390,23 +390,23 @@ class RulesScene(
 
         ) {
             // рыцарь
-            PicRender.RenderImage(R.drawable.rules_unit_knight, 23.dp, 3.dp, 119.dp)
-            PicRender.RenderText("Рыцарь", 37.dp, 123.dp, 26, color = Color(0xFF3B2412))
+            PicRender.RenderImage(R.drawable.rules_unit_knight, ScRel.x(5.59f), ScRel.y(0.32f), ScRel.x(28.92f))
+            PicRender.RenderText("Рыцарь", ScRel.x(8.99f), ScRel.y(13.32f), ScRel.font(2.82f), color = Color(0xFF3B2412))
 
             // цена
-            PicRender.RenderImage(R.drawable.rules_stat_coin, 5.dp, 156.dp, 29.dp)
-            PicRender.RenderText("Цена", 37.dp, 156.dp, 20)
-            PicRender.RenderText("600", 129.dp, 156.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(1.22f), ScRel.y(16.89f), ScRel.x(7.05f))
+            PicRender.RenderText("Цена", ScRel.x(8.99f), ScRel.y(16.89f), ScRel.font(2.17f))
+            PicRender.RenderText("600", ScRel.x(31.35f), ScRel.y(16.89f), ScRel.font(2.17f))
 
             // за ход
-            PicRender.RenderImage(R.drawable.rules_stat_boot, 5.dp, 186.dp, 29.dp)
-            PicRender.RenderText("За ход", 37.dp, 186.dp, 20)
-            PicRender.RenderText("-300", 117.dp, 186.dp, 20, color = Color(0xFF9B2C2C))
+            PicRender.RenderImage(R.drawable.rules_stat_boot, ScRel.x(1.22f), ScRel.y(20.14f), ScRel.x(7.05f))
+            PicRender.RenderText("За ход", ScRel.x(8.99f), ScRel.y(20.14f), ScRel.font(2.17f))
+            PicRender.RenderText("-300", ScRel.x(28.44f), ScRel.y(20.14f), ScRel.font(2.17f), color = Color(0xFF9B2C2C))
 
             // защита
-            PicRender.RenderImage(R.drawable.rules_stat_shield, 5.dp, 216.dp, 29.dp)
-            PicRender.RenderText("Защита", 37.dp, 216.dp, 20)
-            PicRender.RenderText("3", 148.dp, 216.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_shield, ScRel.x(1.22f), ScRel.y(23.39f), ScRel.x(7.05f))
+            PicRender.RenderText("Защита", ScRel.x(8.99f), ScRel.y(23.39f), ScRel.font(2.17f))
+            PicRender.RenderText("3", ScRel.x(35.97f), ScRel.y(23.39f), ScRel.font(2.17f))
         }
     }
 
@@ -420,23 +420,23 @@ class RulesScene(
 
         ) {
             // паладин
-            PicRender.RenderImage(R.drawable.rules_unit_paladin, 23.dp, 3.dp, 119.dp)
-            PicRender.RenderText("Паладин", 37.dp, 123.dp, 26, color = Color(0xFF3B2412))
+            PicRender.RenderImage(R.drawable.rules_unit_paladin, ScRel.x(5.59f), ScRel.y(0.32f), ScRel.x(28.92f))
+            PicRender.RenderText("Паладин", ScRel.x(8.99f), ScRel.y(13.32f), ScRel.font(2.82f), color = Color(0xFF3B2412))
 
             // цена
-            PicRender.RenderImage(R.drawable.rules_stat_coin, 5.dp, 156.dp, 29.dp)
-            PicRender.RenderText("Цена", 37.dp, 156.dp, 20)
-            PicRender.RenderText("1500", 117.dp, 156.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(1.22f), ScRel.y(16.89f), ScRel.x(7.05f))
+            PicRender.RenderText("Цена", ScRel.x(8.99f), ScRel.y(16.89f), ScRel.font(2.17f))
+            PicRender.RenderText("1500", ScRel.x(28.44f), ScRel.y(16.89f), ScRel.font(2.17f))
 
             // за ход
-            PicRender.RenderImage(R.drawable.rules_stat_boot, 5.dp, 186.dp, 29.dp)
-            PicRender.RenderText("За ход", 37.dp, 186.dp, 20)
-            PicRender.RenderText("-800", 117.dp, 186.dp, 20, color = Color(0xFF9B2C2C))
+            PicRender.RenderImage(R.drawable.rules_stat_boot, ScRel.x(1.22f), ScRel.y(20.14f), ScRel.x(7.05f))
+            PicRender.RenderText("За ход", ScRel.x(8.99f), ScRel.y(20.14f), ScRel.font(2.17f))
+            PicRender.RenderText("-800", ScRel.x(28.44f), ScRel.y(20.14f), ScRel.font(2.17f), color = Color(0xFF9B2C2C))
 
             // защита
-            PicRender.RenderImage(R.drawable.rules_stat_shield, 5.dp, 216.dp, 29.dp)
-            PicRender.RenderText("Защита", 37.dp, 216.dp, 20)
-            PicRender.RenderText("4", 148.dp, 216.dp, 20)
+            PicRender.RenderImage(R.drawable.rules_stat_shield, ScRel.x(1.22f), ScRel.y(23.39f), ScRel.x(7.05f))
+            PicRender.RenderText("Защита", ScRel.x(8.99f), ScRel.y(23.39f), ScRel.font(2.17f))
+            PicRender.RenderText("4", ScRel.x(35.97f), ScRel.y(23.39f), ScRel.font(2.17f))
         }
     }
 

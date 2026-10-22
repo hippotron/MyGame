@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mygame.ButtonImage
+import com.example.mygame.PackageForKoor.ScreenRel
 import com.example.mygame.PictureRender
 import com.example.mygame.R
 import com.example.mygame.Scene.ForScene.GameEngine
@@ -36,28 +37,12 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
     val displayMetrics = context.resources.displayMetrics
     val screenXpx = displayMetrics.widthPixels
     val screenYpx = displayMetrics.heightPixels
-    private val density = displayMetrics.density
-    private val screenW = (screenXpx / density).dp
+    private val ScRel = ScreenRel(context)
 
-    private val titleY = ((screenYpx * 0.135f) / density).dp + 4.dp
-    private val cardW = screenW * 0.82f
-    private val cardX = (screenW - cardW) / 2
-    private val cardY = titleY + 40.dp
-    private val photoSize = cardW * 0.40f
-    private val photoX = (cardW - photoSize) / 2
-    private val photoTop = 18.dp
-    private val nameY = photoTop + photoSize + 14.dp
-    private val roleY = nameY + 40.dp
-    private val bodyY = roleY + 34.dp
-    private val extraY = bodyY + 84.dp
-    private val steamY = extraY + 58.dp
-    private val yearY = steamY + 86.dp
-    private val cardH = yearY + 48.dp
-
-    private val steamLeftPx = (cardX.value * density).toInt()
-    private val steamRightPx = ((cardX.value + cardW.value) * density).toInt()
-    private val steamTopPx = ((cardY.value + steamY.value) * density).toInt()
-    private val steamBottomPx = ((cardY.value + yearY.value) * density).toInt()
+    private val steamLeftPx = (screenXpx * 0.0900f).toInt()
+    private val steamRightPx = (screenXpx * 0.9100f).toInt()
+    private val steamTopPx = (screenYpx * 0.5974f).toInt()
+    private val steamBottomPx = (screenYpx * 0.6905f).toInt()
 
     // Тот же размер, что у кнопок главного меню
     val button_return = ButtonImage(
@@ -79,52 +64,52 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
 
         Box(
             modifier = Modifier
-                .offset(x = cardX, y = cardY)
-                .size(width = cardW, height = cardH)
+                .offset(x = ScRel.x(9.00f), y = ScRel.y(18.26f))
+                .size(width = ScRel.x(82.00f), height = ScRel.y(55.98f))
                 .parchmentCard()
         ) {
-            PicRender.RenderImage(R.drawable.author_photo, photoX, photoTop, photoSize)
+            PicRender.RenderImage(R.drawable.author_photo, ScRel.x(24.60f), ScRel.y(1.95f), ScRel.x(32.80f))
             PicRender.RenderText(
                 "Лев Абасов",
-                0.dp, nameY, 28,
+                ScRel.x(0f), ScRel.y(18.08f), ScRel.font(3.03f),
                 color = Color(0xFF3B2412),
                 center = true
             )
             PicRender.RenderText(
                 "Автор и разработчик",
-                0.dp, roleY, 18,
+                ScRel.x(0f), ScRel.y(22.41f), ScRel.font(1.95f),
                 color = Color(0xFF6B4A2A),
                 center = true
             )
             PicRender.RenderText(
                 "Это моя первая мобильная игра.\nСделал её сам на Kotlin для Android:\nкод, интерфейс и оформление.",
-                0.dp, bodyY, 17,
+                ScRel.x(0f), ScRel.y(26.09f), ScRel.font(1.84f),
                 bold = false,
                 color = Color(0xFF6B4A2A),
                 center = true
             )
             PicRender.RenderText(
                 "Люблю доводить мелочи до конца:\nостров, юниты и эта карточка.",
-                0.dp, extraY, 17,
+                ScRel.x(0f), ScRel.y(35.19f), ScRel.font(1.84f),
                 bold = false,
                 color = Color(0xFF6B4A2A),
                 center = true
             )
             PicRender.RenderText(
                 "Steam\nsteamcommunity.com/profiles/\n76561199827418152",
-                0.dp, steamY, 17,
+                ScRel.x(0f), ScRel.y(41.47f), ScRel.font(1.84f),
                 color = Color(0xFF3B2412),
                 center = true
             )
             PicRender.RenderText(
                 "2026",
-                0.dp, yearY, 18,
+                ScRel.x(0f), ScRel.y(50.78f), ScRel.font(1.95f),
                 color = Color(0xFF3B2412),
                 center = true
             )
         }
 
-        //PicRender.RenderText("Авторы", 0.dp, titleY, 28, color = Color.White, center = true)
+        //PicRender.RenderText("Авторы", ScRel.x(0f), ScRel.y(13.93f), ScRel.font(3.03f), color = Color.White, center = true)
 
         button_return.Render()
     }

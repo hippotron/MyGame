@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mygame.PackageForKoor.ScreenRel
 import com.example.mygame.Terrain
 
 object GameHudColors {
@@ -93,7 +94,7 @@ class GameHudLayout(val screenX: Int, val screenY: Int) {
     fun endTurnModalY(): Int = (screenY - endTurnModalH()) / 2
 }
 
-class GameHudRender {
+class GameHudRender(private val ScRel: ScreenRel) {
 
     private val PicRender = PictureRender()
 
@@ -155,47 +156,47 @@ class GameHudRender {
         playerName: String,
         netIncome: Int
     ) {
-        val coinSize = 32.dp
-        PicRender.RenderImage(R.drawable.rules_stat_coin, 16.dp, 22.dp, coinSize)
+        val coinSize = ScRel.x(7.78f)
+        PicRender.RenderImage(R.drawable.rules_stat_coin, ScRel.x(3.89f), ScRel.y(2.38f), coinSize)
         PicRender.RenderText(
             kazna.toString(),
-            52.dp,
-            28.dp,
-            26,
+            ScRel.x(12.64f),
+            ScRel.y(3.03f),
+            ScRel.font(2.82f),
             bold = true,
             color = GameHudColors.titleBrown
         )
         PicRender.RenderText(
             "ТЕКУЩИЙ ХОД",
-            0.dp,
-            16.dp,
-            14,
+            ScRel.x(0f),
+            ScRel.y(1.73f),
+            ScRel.font(1.52f),
             bold = false,
             center = true,
             color = GameHudColors.bodyBrown
         )
         PicRender.RenderText(
             playerName,
-            0.dp,
-            34.dp,
-            24,
+            ScRel.x(0f),
+            ScRel.y(3.68f),
+            ScRel.font(2.60f),
             bold = true,
             center = true,
             color = GameHudColors.titleBrown
         )
         val incomeText = if (netIncome >= 0) "+$netIncome" else netIncome.toString()
         val incomeColor = if (netIncome >= 0) GameHudColors.incomeGreen else GameHudColors.costRed
-        val incomeTextX = layout.hamburgerX.toScreenDp() - 88.dp
+        val incomeTextX = layout.hamburgerX.toScreenDp() - ScRel.x(21.39f)
         PicRender.RenderText(
             incomeText,
             incomeTextX,
-            28.dp,
-            24,
+            ScRel.y(3.03f),
+            ScRel.font(2.60f),
             bold = true,
             color = incomeColor
         )
-        val incomeCoinX = layout.hamburgerX.toScreenDp() - 34.dp
-        PicRender.RenderImage(R.drawable.rules_stat_coin, incomeCoinX, 28.dp, 28.dp)
+        val incomeCoinX = layout.hamburgerX.toScreenDp() - ScRel.x(8.26f)
+        PicRender.RenderImage(R.drawable.rules_stat_coin, incomeCoinX, ScRel.y(3.03f), ScRel.x(6.81f))
     }
 
     @Composable
@@ -272,14 +273,14 @@ class GameHudRender {
             PicRender.RenderImage(
                 iconRes,
                 (boxW - iconSize) / 2,
-                2.dp,
+                ScRel.y(0.22f),
                 iconSize
             )
             PicRender.RenderText(
                 label,
-                0.dp,
+                ScRel.x(0f),
                 boxH * 0.70f,
-                14,
+                ScRel.font(1.52f),
                 bold = true,
                 center = true,
                 color = textColor
@@ -292,7 +293,7 @@ class GameHudRender {
         val shape = RoundedCornerShape(12.dp)
         val boxW = w.toScreenDp()
         val boxH = h.toScreenDp()
-        val arrowSize = 32.dp
+        val arrowSize = ScRel.x(7.78f)
         Box(
             modifier = Modifier
                 .offset(x.toScreenDp(), y.toScreenDp())
@@ -310,8 +311,8 @@ class GameHudRender {
             PicRender.RenderText(
                 "Конец хода",
                 boxW * 0.26f,
-                (boxH - 24.dp) / 2,
-                24,
+                (boxH - ScRel.y(2.60f)) / 2,
+                ScRel.font(2.60f),
                 bold = true,
                 color = Color.White
             )
@@ -322,9 +323,9 @@ class GameHudRender {
     fun ShopUnitHeader(layout: GameHudLayout) {
         PicRender.RenderText(
             "Цена · За ход · Защита",
-            0.dp,
-            layout.shopCardsY().toScreenDp() - 18.dp,
-            16,
+            ScRel.x(0f),
+            layout.shopCardsY().toScreenDp() - ScRel.y(1.95f),
+            ScRel.font(1.73f),
             center = true,
             color = GameHudColors.bodyBrown
         )
@@ -339,14 +340,14 @@ class GameHudRender {
         value: String,
         valueColor: Color
     ) {
-        val iconSize = 16.dp
-        PicRender.RenderImage(iconRes, 4.dp, rowY, iconSize)
-        PicRender.RenderText(label, 22.dp, rowY, 11, bold = false, color = GameHudColors.bodyBrown)
+        val iconSize = ScRel.x(3.89f)
+        PicRender.RenderImage(iconRes, ScRel.x(0.97f), rowY, iconSize)
+        PicRender.RenderText(label, ScRel.x(5.35f), rowY, ScRel.font(1.19f), bold = false, color = GameHudColors.bodyBrown)
         PicRender.RenderText(
             value,
-            cardW - 22.dp,
+            cardW - ScRel.x(7f),
             rowY,
-            11,
+            ScRel.font(1.19f),
             bold = true,
             color = valueColor
         )
@@ -383,14 +384,14 @@ class GameHudRender {
             PicRender.RenderImage(
                 iconRes,
                 (boxW - artSize) / 2,
-                2.dp,
+                ScRel.y(0.22f),
                 artSize
             )
             PicRender.RenderText(
                 title,
-                0.dp,
+                ScRel.x(0f),
                 boxH * 0.42f,
-                16,
+                ScRel.font(1.73f),
                 bold = true,
                 center = true,
                 color = GameHudColors.titleBrown
@@ -443,7 +444,7 @@ class GameHudRender {
         val boxW = w.toScreenDp()
         val boxH = h.toScreenDp()
         val artSize = boxW * 0.62f
-        val titleSize = if (title == "Усиленная башня") 14 else 16
+        val titleSize = if (title == "Усиленная башня") ScRel.font(1.52f) else ScRel.font(1.73f)
         Box(
             modifier = Modifier
                 .offset(x.toScreenDp(), y.toScreenDp())
@@ -455,12 +456,12 @@ class GameHudRender {
             PicRender.RenderImage(
                 iconRes,
                 (boxW - artSize) / 2,
-                2.dp,
+                ScRel.y(0.22f),
                 artSize
             )
             PicRender.RenderText(
                 title,
-                0.dp,
+                ScRel.x(0f),
                 boxH * 0.40f,
                 titleSize,
                 bold = true,
@@ -486,9 +487,9 @@ class GameHudRender {
                 )
                 PicRender.RenderText(
                     farmExtraLine,
-                    0.dp,
+                    ScRel.x(0f),
                     boxH * 0.80f,
-                    10,
+                    ScRel.font(1.08f),
                     bold = false,
                     center = true,
                     color = GameHudColors.bodyBrown
@@ -534,41 +535,41 @@ class GameHudRender {
                 .parchmentCard()
         ) {
             val iconSize = boxH * 0.72f
-            PicRender.RenderImage(unitIconRes, 8.dp, (boxH - iconSize) / 2, iconSize)
+            PicRender.RenderImage(unitIconRes, ScRel.x(1.94f), (boxH - iconSize) / 2, iconSize)
             PicRender.RenderText(
                 unitTitle,
-                iconSize + 16.dp,
-                (boxH - 18.dp) / 2,
-                18,
+                iconSize + ScRel.x(3.89f),
+                (boxH - ScRel.y(1.95f)) / 2,
+                ScRel.font(1.95f),
                 bold = true,
                 color = GameHudColors.titleBrown
             )
             val statIcon = boxH * 0.5f
             PicRender.RenderImage(
                 R.drawable.rules_stat_boot,
-                boxW - 88.dp,
+                boxW - ScRel.x(21.39f),
                 (boxH - statIcon) / 2,
                 statIcon
             )
             PicRender.RenderText(
                 movement.toString(),
-                boxW - 56.dp,
-                (boxH - 16.dp) / 2,
-                16,
+                boxW - ScRel.x(13.61f),
+                (boxH - ScRel.y(1.73f)) / 2,
+                ScRel.font(1.73f),
                 bold = true,
                 color = GameHudColors.titleBrown
             )
             PicRender.RenderImage(
                 R.drawable.rules_stat_shield,
-                boxW - 48.dp,
+                boxW - ScRel.x(11.67f),
                 (boxH - statIcon) / 2,
                 statIcon
             )
             PicRender.RenderText(
                 protection.toString(),
-                boxW - 16.dp,
-                (boxH - 16.dp) / 2,
-                16,
+                boxW - ScRel.x(3.89f),
+                (boxH - ScRel.y(1.73f)) / 2,
+                ScRel.font(1.73f),
                 bold = true,
                 color = GameHudColors.titleBrown
             )
@@ -598,30 +599,30 @@ class GameHudRender {
         ) {
             PicRender.RenderImage(
                 R.drawable.rules_fleur,
-                (cardW - 34.dp) / 2,
-                4.dp,
-                34.dp
+                (cardW - ScRel.x(8.26f)) / 2,
+                ScRel.y(0.43f),
+                ScRel.x(8.26f)
             )
             PicRender.RenderText(
                 "Конец хода?",
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.26f,
-                22,
+                ScRel.font(2.38f),
                 bold = true,
                 center = true,
                 color = GameHudColors.titleBrown
             )
             PicRender.RenderText(
                 "Вы хотите закончить ход?",
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.40f,
-                14,
+                ScRel.font(1.52f),
                 center = true,
                 color = GameHudColors.bodyBrown
             )
         }
-        BrownLabelButton(noX, noY, noW, noH, "Нет", 15)
-        GreenLabelButton(yesX, yesY, yesW, yesH, "Да", 15)
+        BrownLabelButton(noX, noY, noW, noH, "Нет", 1.62f)
+        GreenLabelButton(yesX, yesY, yesW, yesH, "Да", 1.62f)
     }
 
     @Composable
@@ -652,14 +653,14 @@ class GameHudRender {
                 contentDescription = "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .offset((cardW - 40.dp) / 2, 4.dp)
-                    .size(40.dp)
+                    .offset((cardW - ScRel.x(9.72f)) / 2, ScRel.y(0.43f))
+                    .size(ScRel.x(9.72f))
             )
             PicRender.RenderText(
                 "Пауза",
-                0.dp,
-                52.dp,
-                36,
+                ScRel.x(0f),
+                ScRel.y(5.63f),
+                ScRel.font(3.90f),
                 bold = true,
                 center = true,
                 color = GameHudColors.titleBrown
@@ -680,16 +681,16 @@ class GameHudRender {
             ) {
                 PicRender.RenderText(
                     statusMessage,
-                    0.dp,
-                    (statusH.toScreenDp() - 24.dp) / 2,
-                    17,
+                    ScRel.x(0f),
+                    (statusH.toScreenDp() - ScRel.y(2.60f)) / 2,
+                    ScRel.font(1.84f),
                     center = true,
                     color = GameHudColors.incomeGreen
                 )
             }
         }
         for ((label, btn) in menuButtons) {
-            BrownLabelButton(btn.x, btn.y, btn.dx, btn.dy, label, 18)
+            BrownLabelButton(btn.x, btn.y, btn.dx, btn.dy, label, 1.95f)
         }
     }
 
@@ -715,23 +716,23 @@ class GameHudRender {
         ) {
             PicRender.RenderImage(
                 R.drawable.rules_fleur,
-                (cardW - 28.dp) / 2,
-                12.dp,
-                28.dp
+                (cardW - ScRel.x(6.81f)) / 2,
+                ScRel.y(1.30f),
+                ScRel.x(6.81f)
             )
             PicRender.RenderText(
                 "КОНЕЦ ИГРЫ",
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.14f,
-                14,
+                ScRel.font(1.52f),
                 center = true,
                 color = GameHudColors.bodyBrown
             )
             PicRender.RenderText(
                 "Победитель!",
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.24f,
-                28,
+                ScRel.font(3.03f),
                 bold = true,
                 center = true,
                 color = GameHudColors.titleBrown
@@ -746,27 +747,27 @@ class GameHudRender {
             )
             PicRender.RenderText(
                 winnerName,
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.58f,
-                20,
+                ScRel.font(2.17f),
                 bold = true,
                 center = true,
                 color = GameHudColors.titleBrown
             )
             PicRender.RenderText(
                 "Все клетки захвачены",
-                0.dp,
+                ScRel.x(0f),
                 cardH * 0.66f,
-                14,
+                ScRel.font(1.52f),
                 center = true,
                 color = GameHudColors.bodyBrown
             )
         }
-        BrownLabelButton(exitX, exitY, exitW, exitH, "В главное меню", 18)
+        BrownLabelButton(exitX, exitY, exitW, exitH, "В главное меню", 1.95f)
     }
 
     @Composable
-    fun BrownLabelButton(x: Int, y: Int, w: Int, h: Int, label: String, textSize: Int = 18) {
+    fun BrownLabelButton(x: Int, y: Int, w: Int, h: Int, label: String, fontPercent: Float = 1.95f) {
         val boxH = h.toScreenDp()
         Box(
             modifier = Modifier
@@ -776,9 +777,9 @@ class GameHudRender {
         ) {
             PicRender.RenderText(
                 label,
-                0.dp,
-                (boxH - textSize.dp) / 2,
-                textSize,
+                ScRel.x(0f),
+                (boxH - ScRel.y(fontPercent)) / 2,
+                ScRel.font(fontPercent),
                 bold = true,
                 center = true,
                 color = Color.White
@@ -787,7 +788,7 @@ class GameHudRender {
     }
 
     @Composable
-    private fun GreenLabelButton(x: Int, y: Int, w: Int, h: Int, label: String, textSize: Int = 15) {
+    private fun GreenLabelButton(x: Int, y: Int, w: Int, h: Int, label: String, fontPercent: Float = 1.62f) {
         val boxH = h.toScreenDp()
         Box(
             modifier = Modifier
@@ -797,9 +798,9 @@ class GameHudRender {
         ) {
             PicRender.RenderText(
                 label,
-                0.dp,
+                ScRel.x(0f),
                 boxH * 0.28f,
-                textSize,
+                ScRel.font(fontPercent),
                 bold = true,
                 center = true,
                 color = Color.White
@@ -831,9 +832,9 @@ class GameHudRender {
                 Text(
                     text = label,
                     color = Color.White,
-                    fontSize = 15.sp,
+                    fontSize = ScRel.font(1.62f).sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = ScRel.x(0.9f))
                 )
             }
         }

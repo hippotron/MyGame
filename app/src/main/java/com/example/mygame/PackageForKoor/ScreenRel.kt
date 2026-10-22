@@ -22,4 +22,5 @@ class ScreenRel(context: Context) {
 
     fun x(percent: Float): Dp = (screenXDp * percent.toFloat() / 100f).dp
     fun y(percent: Float): Dp = (screenYDp * percent.toFloat() / 100f).dp
+    fun font(percent: Float): Int = (screenYDp * percent / 100f).roundToInt()
 }

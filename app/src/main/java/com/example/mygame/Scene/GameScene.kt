@@ -28,6 +28,7 @@ import com.example.mygame.GameHudRender
 import com.example.mygame.GameStorage
 import com.example.mygame.Scene.ForScene.GameEngine
 import com.example.mygame.GlobalParam.RenderImage
+import com.example.mygame.PackageForKoor.ScreenRel
 import com.example.mygame.PackageForKoor.koorOnInt
 import com.example.mygame.PackagePlayer.OtherForPlayer.Build
 import com.example.mygame.PackagePlayer.Player
@@ -54,7 +55,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     val screenY = displayMetrics.heightPixels
 
     val layout = GameHudLayout(screenX, screenY)
-    private val hudRender = GameHudRender()
+    private val ScRel = ScreenRel(context)
+    private val hudRender = GameHudRender(ScRel)
     private val hitboxDrawable = R.drawable.transparent_hexagon
 
     var pole = Pole(context = context)
