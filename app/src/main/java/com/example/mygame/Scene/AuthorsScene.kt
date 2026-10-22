@@ -82,14 +82,14 @@ class AuthorsScene(override var game: GameEngine, context: Context) : Scene {
                 center = true
             )
             PicRender.RenderText(
-                "Это моя первая мобильная игра.\nСделал её сам на Kotlin для Android:\nкод, интерфейс и оформление.",
+                "Это моя первая мобильная игра.\nЯ сделал её сам на языке Kotlin для Android",
                 ScRel.x(0f), ScRel.y(26.09f), ScRel.font(1.84f),
                 bold = false,
                 color = Color(0xFF6B4A2A),
                 center = true
             )
             PicRender.RenderText(
-                "Люблю доводить мелочи до конца:\nостров, юниты и эта карточка.",
+                "Люблю играть в компьютерные игры. \nСнизу ссылка на мой аккаунт в steam",
                 ScRel.x(0f), ScRel.y(35.19f), ScRel.font(1.84f),
                 bold = false,
                 color = Color(0xFF6B4A2A),
