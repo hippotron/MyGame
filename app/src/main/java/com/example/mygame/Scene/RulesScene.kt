@@ -120,7 +120,7 @@ class RulesScene(
     fun RenderHeader(slide: Int) {
         RenderFull(R.drawable.background_menu)
         RenderFull(R.drawable.rules_parchment)
-        PicRender.RenderImage(R.drawable.rules_fleur, ScRel.x(49.58f), ScRel.y(11.91f), ScRel.x(6.81f))
+        PicRender.RenderImage(R.drawable.rules_fleur, ScRel.x(45f), ScRel.y(11.91f), ScRel.x(10f))
         PicRender.RenderText("Правила", ScRel.x(0f), ScRel.y(15.70f), ScRel.font(4.77f), color = Color(0xFF3B2412), center = true)
         val title = when (slide) {
             1 -> "Начало игры"
