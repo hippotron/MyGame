@@ -7,7 +7,8 @@ data class GameMap_data(
     var economic: Map<String, Economic>,  // Используем String как ключ
     var listPlayer: List<player_data>,
     var hod_player: Int,
-    var pole: Pole_data
+    var pole: Pole_data,
+    var biomeSeed: Long = 0
 )
 
 data class Pole_data(

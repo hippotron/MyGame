@@ -549,7 +549,8 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
                 economic = economicMap,
                 listPlayer = list_data_players,
                 hod_player = hod_player,
-                pole = poleData
+                pole = poleData,
+                biomeSeed = pole.biomeSeed
             )
 
             val gameStorage = GameStorage(context)
@@ -593,6 +594,9 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             economic = terrainMap // сделан economic
 
             hod_player = gameMap.hod_player // сделан hod_player
+            if (gameMap.biomeSeed != 0L) {
+                pole.applyBiomeSeed(gameMap.biomeSeed)
+            }
 
             // Очищаем список игроков
             listPlayers.clear()

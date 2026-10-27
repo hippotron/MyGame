@@ -24,7 +24,9 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
+import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.random.Random
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.example.mygame.GlobalParam.GlobalDxKoef
@@ -53,11 +55,11 @@ class Pole(
         R.drawable.hex_purple,   //8
     )
     private val landDrawables = listOf(
-        R.drawable.land_meadow,  // левый верх
-        R.drawable.land_flowers, // правый верх
-        R.drawable.land_wheat,   // левый низ
-        R.drawable.land_palms,   // правый низ
-        R.drawable.land_bushes,  // середина
+        R.drawable.land_meadow,
+        R.drawable.land_flowers,
+        R.drawable.land_wheat,
+        R.drawable.land_palms,
+        R.drawable.land_bushes,
     )
     private val ownerColors = listOf(
         Color(0xFF7F7F7F),
@@ -94,6 +96,10 @@ class Pole(
     private var initialY2 = 0
     private var touchState by mutableStateOf(TouchState())
 
+    var biomeSeed: Long = 0
+        private set
+    private var biomeCenters: List<Pair<Float, Float>> = emptyList()
+
     init {
         initializePole()
     }
@@ -101,6 +107,19 @@ class Pole(
     private fun initializePole() {
         mass = createCellMatrix(11,17)
         calculateHexagonWidth( )
+        applyBiomeSeed(0L)
+    }
+
+    fun applyBiomeSeed(seed: Long) {
+        var resolved = seed
+        if (resolved == 0L) {
+            resolved = Random.nextLong()
+            if (resolved == 0L) resolved = 1L
+        }
+        biomeSeed = resolved
+        val cols = mass.size
+        val rows = if (mass.isEmpty()) 0 else mass[0].size
+        biomeCenters = placeBiomeCenters(cols, rows, landDrawables.size, Random(resolved))
     }
 
     fun createCellMatrix(width: Int, height: Int): MutableList<MutableList<Cell>> {
@@ -346,24 +365,51 @@ class Pole(
         return sqrt((deltaX * deltaX + deltaY * deltaY).toDouble()).toInt()
     }
 
-    private fun biomeWeights(i: Int, j: Int, cols: Int, rows: Int): FloatArray {
-        val u = if (cols <= 1) 0f else i / (cols - 1f)
-        val v = if (rows <= 1) 0f else j / (rows - 1f)
-        val center = 16f * u * (1f - u) * v * (1f - v)
-        val edge = 1f - center
-        return floatArrayOf(
-            edge * (1f - u) * (1f - v),
-            edge * u * (1f - v),
-            edge * (1f - u) * v,
-            edge * u * v,
-            center
-        )
+    private fun placeBiomeCenters(
+        cols: Int,
+        rows: Int,
+        count: Int,
+        random: Random
+    ): List<Pair<Float, Float>> {
+        if (cols <= 0 || rows <= 0 || count <= 0) return emptyList()
+        val minDist = min(cols, rows) / 3f
+        val points = mutableListOf<Pair<Float, Float>>()
+        repeat(80) {
+            if (points.size >= count) return points
+            val candidate = Pair(random.nextFloat() * (cols - 1), random.nextFloat() * (rows - 1))
+            if (points.all { biomeDistance(it, candidate) >= minDist }) {
+                points.add(candidate)
+            }
+        }
+        while (points.size < count) {
+            points.add(Pair(random.nextFloat() * (cols - 1), random.nextFloat() * (rows - 1)))
+        }
+        return points
+    }
+
+    private fun biomeDistance(a: Pair<Float, Float>, b: Pair<Float, Float>): Float {
+        val dx = (a.first - b.first) * 0.74f
+        val dy = a.second - b.second
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    private fun biomeWeights(i: Int, j: Int): FloatArray {
+        if (biomeCenters.isEmpty()) {
+            return FloatArray(landDrawables.size) { index -> if (index == 0) 1f else 0f }
+        }
+        return FloatArray(biomeCenters.size) { index ->
+            val center = biomeCenters[index]
+            val dx = (i - center.first) * 0.74f
+            val dy = j - center.second
+            val d2 = dx * dx + dy * dy
+            1f / (d2 + 0.35f)
+        }
     }
 
     private data class BiomeBlend(val first: Int, val second: Int, val secondAlpha: Float)
 
-    private fun biomeBlend(i: Int, j: Int, cols: Int, rows: Int): BiomeBlend {
-        val weights = biomeWeights(i, j, cols, rows)
+    private fun biomeBlend(i: Int, j: Int): BiomeBlend {
+        val weights = biomeWeights(i, j)
         var first = 0
         var second = -1
         for (k in 1 until weights.size) {
@@ -423,7 +469,7 @@ class Pole(
                                 continue
                             }
                             val path = flatTopHexPath(posX.toFloat(), posY.toFloat(), cellSize.toFloat())
-                            val blend = biomeBlend(i, j, mass.size, mass[i].size)
+                            val blend = biomeBlend(i, j)
                             val dst = IntOffset(posX, posY)
                             val dstSize = IntSize(cellSize, cellSize)
                             clipPath(path) {
