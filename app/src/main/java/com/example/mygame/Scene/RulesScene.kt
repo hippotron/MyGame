@@ -290,20 +290,20 @@ class RulesScene(
 
     @Composable
     private fun RenderHex(x: Dp, y: Dp, mark: Boolean) {
-        PicRender.RenderImage(R.drawable.two, x, y, ScRel.x(6.81f))
+        PicRender.RenderImage(R.drawable.hex_cream, x, y, ScRel.x(6.81f))
         if (mark) PicRender.RenderText("2", x + ScRel.x(1.94f), y + ScRel.y(0.43f), ScRel.font(1.30f), color = Color(0xFF3B2412))
     }
 
     @Composable
     private fun RenderMoveSteps() {
-        PicRender.RenderImage(R.drawable.two, ScRel.x(3.89f), ScRel.y(5.63f), ScRel.x(11.67f))
+        PicRender.RenderImage(R.drawable.hex_cream, ScRel.x(3.89f), ScRel.y(5.63f), ScRel.x(11.67f))
         PicRender.RenderImage(R.drawable.skeleton, ScRel.x(5.35f), ScRel.y(6.28f), ScRel.x(8.75f))
         PicRender.RenderText("1", ScRel.x(17.99f), ScRel.y(5.20f), ScRel.font(1.52f), color = Color(0xFF3B2412))
         PicRender.RenderImage(R.drawable.arrow_right, ScRel.x(17.01f), ScRel.y(7.36f), ScRel.x(5.35f))
-        PicRender.RenderImage(R.drawable.two, ScRel.x(26.25f), ScRel.y(5.63f), ScRel.x(11.67f))
+        PicRender.RenderImage(R.drawable.hex_cream, ScRel.x(26.25f), ScRel.y(5.63f), ScRel.x(11.67f))
         PicRender.RenderText("2", ScRel.x(40.35f), ScRel.y(5.20f), ScRel.font(1.52f), color = Color(0xFF3B2412))
         PicRender.RenderImage(R.drawable.arrow_right, ScRel.x(39.38f), ScRel.y(7.36f), ScRel.x(5.35f))
-        PicRender.RenderImage(R.drawable.two, ScRel.x(48.61f), ScRel.y(5.63f), ScRel.x(11.67f))
+        PicRender.RenderImage(R.drawable.hex_cream, ScRel.x(48.61f), ScRel.y(5.63f), ScRel.x(11.67f))
     }
 
     @Composable

@@ -17,7 +17,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
@@ -39,15 +42,33 @@ class Pole(
 
     // Создаём изменяемый двумерный массив
     val image_mass: MutableList<Int> = mutableListOf(
-        R.drawable.one,     //0
-        R.drawable.two,     //1
-        R.drawable.three,   //2
-        R.drawable.four,    //3
-        R.drawable.five,    //4
-        R.drawable.six,     //5
-        R.drawable.seven,   //6
-        R.drawable.eight,   //7
-        R.drawable.nine,    //8
+        R.drawable.hex_grey,     //0
+        R.drawable.hex_cream,    //1
+        R.drawable.hex_blue,     //2
+        R.drawable.hex_green,    //3
+        R.drawable.hex_brown,    //4
+        R.drawable.hex_cyan,     //5
+        R.drawable.hex_red,      //6
+        R.drawable.hex_yellow,   //7
+        R.drawable.hex_purple,   //8
+    )
+    private val landDrawables = listOf(
+        R.drawable.land_meadow,  // левый верх
+        R.drawable.land_flowers, // правый верх
+        R.drawable.land_wheat,   // левый низ
+        R.drawable.land_palms,   // правый низ
+        R.drawable.land_bushes,  // середина
+    )
+    private val ownerColors = listOf(
+        Color(0xFF7F7F7F),
+        Color(0xFFEFE4B0),
+        Color(0xFF3F48CC),
+        Color(0xFF22B14C),
+        Color(0xFFB97A57),
+        Color(0xFF00A2E8),
+        Color(0xFFED1C24),
+        Color(0xFFFFF200),
+        Color(0xFFA349A4),
     )
     val display = koorOnInt(
         context.resources.displayMetrics.widthPixels,
@@ -325,11 +346,57 @@ class Pole(
         return sqrt((deltaX * deltaX + deltaY * deltaY).toDouble()).toInt()
     }
 
+    private fun biomeWeights(i: Int, j: Int, cols: Int, rows: Int): FloatArray {
+        val u = if (cols <= 1) 0f else i / (cols - 1f)
+        val v = if (rows <= 1) 0f else j / (rows - 1f)
+        val center = 16f * u * (1f - u) * v * (1f - v)
+        val edge = 1f - center
+        return floatArrayOf(
+            edge * (1f - u) * (1f - v),
+            edge * u * (1f - v),
+            edge * (1f - u) * v,
+            edge * u * v,
+            center
+        )
+    }
+
+    private data class BiomeBlend(val first: Int, val second: Int, val secondAlpha: Float)
+
+    private fun biomeBlend(i: Int, j: Int, cols: Int, rows: Int): BiomeBlend {
+        val weights = biomeWeights(i, j, cols, rows)
+        var first = 0
+        var second = -1
+        for (k in 1 until weights.size) {
+            if (weights[k] > weights[first]) {
+                second = first
+                first = k
+            } else if (second == -1 || weights[k] > weights[second]) {
+                second = k
+            }
+        }
+        val lead = weights[first]
+        val other = if (second >= 0) weights[second] else 0f
+        val alpha = if (lead > 0f && other >= lead * 0.4f) other / (lead + other) else 0f
+        return BiomeBlend(first, second, alpha)
+    }
+
+    private fun flatTopHexPath(x: Float, y: Float, size: Float): Path {
+        return Path().apply {
+            moveTo(x + size * 0.25f, y)
+            lineTo(x + size * 0.75f, y)
+            lineTo(x + size, y + size * 0.5f)
+            lineTo(x + size * 0.75f, y + size)
+            lineTo(x + size * 0.25f, y + size)
+            lineTo(x, y + size * 0.5f)
+            close()
+        }
+    }
+
     @Composable
     fun drawHexagonPole(){
         val context = LocalContext.current
-        val imageBitmaps = remember {
-            image_mass.map { resourceId ->
+        val landBitmaps = remember {
+            landDrawables.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
             }
         }
@@ -337,6 +404,10 @@ class Pole(
         Canvas(modifier = Modifier.fillMaxSize()) {
             for (i in mass.indices) {
                 for (j in mass[i].indices) {
+                        val cell = mass[i][j]
+                        if (cell.land == Terrain.WATER) {
+                            continue
+                        }
                         var l = 0
                         if (i % 2 != 0) {
                             l = (dx/2)
@@ -347,17 +418,39 @@ class Pole(
                         if (posX + dx > 0 && posX < display.x &&
                             posY + dx > 0 && posY < display.y
                         ) {
-                            // Получаем индекс изображения из массива mass
-                            var imageIndex = 0
-                            if (mass[i][j].player!=null){
-                                imageIndex= mass[i][j].player!!.color
+                            val cellSize = dx.toInt()
+                            if (cellSize <= 0 || landBitmaps.isEmpty()) {
+                                continue
                             }
-
-                            if (imageIndex in imageBitmaps.indices) {
+                            val path = flatTopHexPath(posX.toFloat(), posY.toFloat(), cellSize.toFloat())
+                            val blend = biomeBlend(i, j, mass.size, mass[i].size)
+                            val dst = IntOffset(posX, posY)
+                            val dstSize = IntSize(cellSize, cellSize)
+                            clipPath(path) {
                                 drawImage(
-                                    image = imageBitmaps[imageIndex],
-                                    dstOffset = IntOffset(posX, posY),
-                                    dstSize = IntSize(dx.toInt(), dx.toInt())
+                                    image = landBitmaps[blend.first],
+                                    dstOffset = dst,
+                                    dstSize = dstSize
+                                )
+                                if (blend.secondAlpha > 0f && blend.second in landBitmaps.indices) {
+                                    drawImage(
+                                        image = landBitmaps[blend.second],
+                                        dstOffset = dst,
+                                        dstSize = dstSize,
+                                        alpha = blend.secondAlpha
+                                    )
+                                }
+                            }
+                            val owner = cell.player
+                            if (owner != null && owner.color in ownerColors.indices) {
+                                val color = ownerColors[owner.color]
+                                drawPath(path, color.copy(alpha = 0.22f))
+                                drawPath(path, color, style = Stroke(width = cellSize * 0.06f))
+                            } else {
+                                drawPath(
+                                    path,
+                                    Color(0xFF3B2A1A),
+                                    style = Stroke(width = cellSize * 0.03f)
                                 )
                             }
 
