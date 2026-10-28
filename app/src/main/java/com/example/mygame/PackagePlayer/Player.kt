@@ -201,6 +201,7 @@ class Player(
             val possibleMovesSet = possibleMoves.map { Pair(it.x, it.y) }
             for (i in pole.mass.indices) {
                 for (j in pole.mass[i].indices) {
+                    if (pole.mass[i][j].land == Terrain.WATER) continue
                     // Проверяем, что клетка НЕ входит в possibleMoves
                     if (Pair(i, j) !in possibleMovesSet) {
                         // прозначный шестигранник

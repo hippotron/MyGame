@@ -101,18 +101,13 @@ class RulesScene(
             if (slide <= 3) button_arrow_right.Render()
             button_return.Render()
 
-            if (slide == 1) {
-                RenderStart()
+            when(slide){
+                1 -> RenderStart()
+                2 -> RenderUnits()
+                3 -> RenderBuildings()
+                4 -> RenderBattle()
             }
-            if (slide == 2) {
-                RenderUnits()
-            }
-            if (slide == 3) {
-                RenderBuildings()
-            }
-            if (slide == 4) {
-                RenderBattle()
-            }
+
         }
     }
 

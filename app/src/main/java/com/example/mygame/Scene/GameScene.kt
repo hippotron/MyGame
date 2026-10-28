@@ -334,45 +334,24 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             player.sale = 0
         }
 
-        for (player in listPlayers.indices){
-            //val (x,y)=randomXY()
-
-            if (player==0){
-                pole.mass[pole.mass.size-2][1].player=listPlayers[player]
-                //pole.mass[pole.mass.size-1][0].player=listPlayers[player]
-                cellPlayerInit(pole.mass.size-2,1,listPlayers[player])
-                listPlayers[player].units.add(
-                    Unit(
-                        koorOnInt(pole.mass.size - 2, 1),
-                        Terrain.UNIT1,
-                        pole.dx,
-                        2
-                    )
+        val starts = randomIslandStarts()
+        val origins = listOf(starts.first, starts.second)
+        for (player in listPlayers.indices) {
+            val cell = origins.getOrNull(player) ?: continue
+            pole.mass[cell.x][cell.y].player = listPlayers[player]
+        }
+        for (player in listPlayers.indices) {
+            val cell = origins.getOrNull(player) ?: continue
+            val count = 2 + kotlin.random.Random.nextInt(2)
+            claimStartCluster(listPlayers[player], cell, count)
+            listPlayers[player].units.add(
+                Unit(
+                    koorOnInt(cell.x, cell.y),
+                    Terrain.UNIT1,
+                    pole.dx,
+                    2
                 )
-                //listPlayers[player].addUnit(pole.mass.size-2,0, Terrain.UNIT1,pole.dx)
-            } else if (player==1){
-                pole.mass[1][pole.mass[0].size-2].player=listPlayers[player]
-                cellPlayerInit(1,pole.mass[0].size-2,listPlayers[player])
-                listPlayers[player].units.add(
-                    Unit(
-                        koorOnInt(1, pole.mass[0].size - 2),
-                        Terrain.UNIT1,
-                        pole.dx,
-                        2
-                    )
-                )
-            } else if (player==2){
-                pole.mass[1][1].player=listPlayers[player]
-                cellPlayerInit(1,1,listPlayers[player])
-                listPlayers[player].units.add(
-                    Unit(
-                        koorOnInt(1, 1),
-                        Terrain.UNIT1,
-                        pole.dx,
-                        2
-                    )
-                )
-            }
+            )
 
             //pole.mass[x][y].player=player
             //cellPlayerInit(x,y,player)
@@ -381,6 +360,56 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
             pole.mass[1][1].player=player
             cellPlayerInit(1,1,pole.mass[1][1].player!!)
             */
+        }
+    }
+
+    private fun randomIslandStarts(): Pair<koorOnInt?, koorOnInt?> {
+        val land = mutableListOf<koorOnInt>()
+        for (i in pole.mass.indices) {
+            for (j in pole.mass[i].indices) {
+                if (pole.mass[i][j].land != Terrain.WATER) {
+                    land.add(koorOnInt(i, j))
+                }
+            }
+        }
+        if (land.isEmpty()) return null to null
+        if (land.size == 1) return land[0] to null
+        val random = kotlin.random.Random
+        var minDist = 4f
+        while (minDist >= 0f) {
+            repeat(40) {
+                val first = land[random.nextInt(land.size)]
+                val second = land[random.nextInt(land.size)]
+                if (first.x == second.x && first.y == second.y) return@repeat
+                if (startDistance(first, second) >= minDist) return first to second
+            }
+            minDist -= 1f
+        }
+        return land[0] to land[1]
+    }
+
+    private fun startDistance(a: koorOnInt, b: koorOnInt): Float {
+        val dx = (a.x - b.x) * 0.74f
+        val dy = (a.y - b.y).toFloat()
+        return kotlin.math.sqrt(dx * dx + dy * dy)
+    }
+
+    private fun claimStartCluster(player: Player, origin: koorOnInt, count: Int) {
+        val claimed = mutableListOf(origin)
+        pole.mass[origin.x][origin.y].player = player
+        val random = kotlin.random.Random
+        while (claimed.size < count) {
+            val frontier = claimed
+                .flatMap { cells_around(it.x, it.y) }
+                .distinctBy { it.x to it.y }
+                .filter { cell ->
+                    claimed.none { it.x == cell.x && it.y == cell.y } &&
+                        pole.mass[cell.x][cell.y].player == null
+                }
+            if (frontier.isEmpty()) break
+            val next = frontier[random.nextInt(frontier.size)]
+            pole.mass[next.x][next.y].player = player
+            claimed.add(next)
         }
     }
 
@@ -623,15 +652,13 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
 
             for (i in poleData.indices) {
                 for (j in poleData[i].indices) {
+                    pole.mass[i][j].land = poleData[i][j].land
                     if (poleData[i][j].player != null) {
-                        //println(poleData[i][j].player!!)
                         pole.mass[i][j].player = listPlayers[poleData[i][j].player!!]
                         pole.mass[i][j].protection = poleData[i][j].protection
-                        pole.mass[i][j].land = poleData[i][j].land
                     } else {
                         pole.mass[i][j].player = null
                         pole.mass[i][j].protection = 0
-                        pole.mass[i][j].land = Terrain.LAND
                     }
                 }
             }
@@ -1023,6 +1050,7 @@ class GameScene(override var game: GameEngine, val context: Context) : Scene {
     fun DrawScope.RenderConstructionCells(possibleBitmap: ImageBitmap){
         for (i in pole.mass.indices){
             for (j in pole.mass[i].indices){
+                if (pole.mass[i][j].land == Terrain.WATER) continue
                 if (pole.mass[i][j].player == listPlayers[hod_player] && isValidMove(
                         koorOnInt(
                             i,

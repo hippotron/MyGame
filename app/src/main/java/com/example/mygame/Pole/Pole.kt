@@ -61,6 +61,14 @@ class Pole(
         R.drawable.land_palms,
         R.drawable.land_bushes,
     )
+    private val shoreDrawables = listOf(
+        R.drawable.edge_water_n,
+        R.drawable.edge_water_ne,
+        R.drawable.edge_water_se,
+        R.drawable.edge_water_s,
+        R.drawable.edge_water_sw,
+        R.drawable.edge_water_nw,
+    )
     private val ownerColors = listOf(
         Color(0xFF7F7F7F),
         Color(0xFFEFE4B0),
@@ -120,6 +128,146 @@ class Pole(
         val cols = mass.size
         val rows = if (mass.isEmpty()) 0 else mass[0].size
         biomeCenters = placeBiomeCenters(cols, rows, landDrawables.size, Random(resolved))
+        paintIsland(resolved)
+    }
+
+    private fun paintIsland(seed: Long) {
+        val cols = mass.size
+        val rows = if (mass.isEmpty()) 0 else mass[0].size
+        if (cols == 0 || rows == 0) return
+        val noise = smoothedNoise(cols, rows, seed)
+        val total = cols * rows
+        var low = 0.45f
+        var high = 1.25f
+        var chosen = islandMask(cols, rows, noise, 0.9f)
+        for (step in 0 until 8) {
+            val mid = (low + high) / 2f
+            val mask = islandMask(cols, rows, noise, mid)
+            val landCount = mask.sumOf { column -> column.count { it } }
+            val fraction = landCount / total.toFloat()
+            chosen = mask
+            if (fraction in 0.55f..0.70f) break
+            if (fraction < 0.55f) low = mid else high = mid
+        }
+        for (i in mass.indices) {
+            for (j in mass[i].indices) {
+                mass[i][j].land = if (chosen[i][j]) Terrain.LAND else Terrain.WATER
+            }
+        }
+    }
+
+    private fun smoothedNoise(cols: Int, rows: Int, seed: Long): Array<FloatArray> {
+        val raw = Array(cols) { i ->
+            FloatArray(rows) { j -> hashNoise(i, j, seed) }
+        }
+        return Array(cols) { i ->
+            FloatArray(rows) { j ->
+                var sum = raw[i][j]
+                val neighbors = hexNeighbors(i, j, cols, rows)
+                for ((nx, ny) in neighbors) sum += raw[nx][ny]
+                sum / (neighbors.size + 1)
+            }
+        }
+    }
+
+    private fun hashNoise(i: Int, j: Int, seed: Long): Float {
+        var n = seed xor (i.toLong() * 374761393L) xor (j.toLong() * 668265263L)
+        n = n xor (n ushr 30)
+        n *= 0xBF58476D1CE4E5B9uL.toLong()
+        n = n xor (n ushr 27)
+        n *= 0x94D049BB133111EBuL.toLong()
+        n = n xor (n ushr 31)
+        return ((n ushr 40) and 0xFFFFFF) / 0xFFFFFF.toFloat()
+    }
+
+    private fun islandMask(
+        cols: Int,
+        rows: Int,
+        noise: Array<FloatArray>,
+        threshold: Float
+    ): Array<BooleanArray> {
+        val halfX = ((cols - 1) / 2f).coerceAtLeast(1f)
+        val halfY = ((rows - 1) / 2f).coerceAtLeast(1f)
+        var mask = Array(cols) { i ->
+            BooleanArray(rows) { j ->
+                val nx = (i - (cols - 1) / 2f) / halfX
+                val ny = (j - (rows - 1) / 2f) / halfY
+                val radial = sqrt(nx * nx + ny * ny)
+                val wobble = (noise[i][j] - 0.5f) * 0.55f
+                radial + wobble < threshold
+            }
+        }
+        repeat(2) { mask = smoothIsland(mask) }
+        if (cols > 0 && rows > 0) {
+            mask[0][0] = false
+            mask[0][rows - 1] = false
+            mask[cols - 1][0] = false
+            mask[cols - 1][rows - 1] = false
+        }
+        return largestComponent(mask)
+    }
+
+    private fun smoothIsland(mask: Array<BooleanArray>): Array<BooleanArray> {
+        val cols = mask.size
+        val rows = mask[0].size
+        val next = Array(cols) { i -> mask[i].copyOf() }
+        for (i in 0 until cols) {
+            for (j in 0 until rows) {
+                var landNeighbors = 0
+                for ((nx, ny) in hexNeighbors(i, j, cols, rows)) {
+                    if (mask[nx][ny]) landNeighbors++
+                }
+                next[i][j] = if (mask[i][j]) landNeighbors >= 2 else landNeighbors >= 5
+            }
+        }
+        return next
+    }
+
+    private fun largestComponent(mask: Array<BooleanArray>): Array<BooleanArray> {
+        val cols = mask.size
+        val rows = if (cols == 0) 0 else mask[0].size
+        val seen = Array(cols) { BooleanArray(rows) }
+        var best = emptyList<Pair<Int, Int>>()
+        for (i in 0 until cols) {
+            for (j in 0 until rows) {
+                if (!mask[i][j] || seen[i][j]) continue
+                val stack = ArrayDeque<Pair<Int, Int>>()
+                val component = mutableListOf<Pair<Int, Int>>()
+                stack.add(i to j)
+                seen[i][j] = true
+                while (stack.isNotEmpty()) {
+                    val (x, y) = stack.removeLast()
+                    component.add(x to y)
+                    for ((nx, ny) in hexNeighbors(x, y, cols, rows)) {
+                        if (mask[nx][ny] && !seen[nx][ny]) {
+                            seen[nx][ny] = true
+                            stack.add(nx to ny)
+                        }
+                    }
+                }
+                if (component.size > best.size) best = component
+            }
+        }
+        val result = Array(cols) { BooleanArray(rows) }
+        for ((x, y) in best) result[x][y] = true
+        return result
+    }
+
+    private fun hexNeighbors(x: Int, y: Int, cols: Int, rows: Int): List<Pair<Int, Int>> {
+        val candidates = arrayListOf(
+            x - 1 to y,
+            x to y - 1,
+            x + 1 to y,
+            x to y + 1
+        )
+        if (x % 2 == 0) {
+            candidates.add(x - 1 to y - 1)
+            candidates.add(x + 1 to y - 1)
+        } else {
+            candidates.add(x - 1 to y + 1)
+            candidates.add(x + 1 to y + 1)
+        }
+        return candidates.filter { (nx, ny) -> nx in 0 until cols && ny in 0 until rows }
     }
 
     fun createCellMatrix(width: Int, height: Int): MutableList<MutableList<Cell>> {
@@ -426,6 +574,26 @@ class Pole(
         return BiomeBlend(first, second, alpha)
     }
 
+    private fun sideOffset(x: Int, side: Int): Pair<Int, Int> {
+        val odd = x % 2 != 0
+        return when (side) {
+            0 -> 0 to -1
+            1 -> if (odd) 1 to 0 else 1 to -1
+            2 -> if (odd) 1 to 1 else 1 to 0
+            3 -> 0 to 1
+            4 -> if (odd) -1 to 1 else -1 to 0
+            else -> if (odd) -1 to 0 else -1 to -1
+        }
+    }
+
+    private fun neighborIsWater(x: Int, y: Int, side: Int): Boolean {
+        val (dxn, dyn) = sideOffset(x, side)
+        val nx = x + dxn
+        val ny = y + dyn
+        if (nx !in mass.indices || mass.isEmpty() || ny !in mass[nx].indices) return true
+        return mass[nx][ny].land == Terrain.WATER
+    }
+
     private fun flatTopHexPath(x: Float, y: Float, size: Float): Path {
         return Path().apply {
             moveTo(x + size * 0.25f, y)
@@ -441,8 +609,11 @@ class Pole(
     @Composable
     fun drawHexagonPole(){
         val context = LocalContext.current
-        val landBitmaps = remember {
-            landDrawables.map { resourceId ->
+        val meadowBitmap = remember {
+            BitmapFactory.decodeResource(context.resources, R.drawable.land_meadow).asImageBitmap()
+        }
+        val shoreBitmaps = remember {
+            shoreDrawables.map { resourceId ->
                 BitmapFactory.decodeResource(context.resources, resourceId).asImageBitmap()
             }
         }
@@ -465,26 +636,26 @@ class Pole(
                             posY + dx > 0 && posY < display.y
                         ) {
                             val cellSize = dx.toInt()
-                            if (cellSize <= 0 || landBitmaps.isEmpty()) {
+                            if (cellSize <= 0) {
                                 continue
                             }
                             val path = flatTopHexPath(posX.toFloat(), posY.toFloat(), cellSize.toFloat())
-                            val blend = biomeBlend(i, j)
                             val dst = IntOffset(posX, posY)
                             val dstSize = IntSize(cellSize, cellSize)
                             clipPath(path) {
                                 drawImage(
-                                    image = landBitmaps[blend.first],
+                                    image = meadowBitmap,
                                     dstOffset = dst,
                                     dstSize = dstSize
                                 )
-                                if (blend.secondAlpha > 0f && blend.second in landBitmaps.indices) {
-                                    drawImage(
-                                        image = landBitmaps[blend.second],
-                                        dstOffset = dst,
-                                        dstSize = dstSize,
-                                        alpha = blend.secondAlpha
-                                    )
+                                for (side in shoreBitmaps.indices) {
+                                    if (neighborIsWater(i, j, side)) {
+                                        drawImage(
+                                            image = shoreBitmaps[side],
+                                            dstOffset = dst,
+                                            dstSize = dstSize
+                                        )
+                                    }
                                 }
                             }
                             val owner = cell.player
